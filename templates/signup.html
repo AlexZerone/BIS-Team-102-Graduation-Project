@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta charset="utf-8">
+        <title>Sign Up - Education System</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/resposive.css') }}">
+    </head>
+    <body class="bg-22333c">
+        <div class="smart-app">
+            <div class="login shadow-lg">
+                <h1 class="text-capitalize">Education System Registration</h1>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST" action="{{ url_for('register') }}" class="form d-flex flex-column">
+                    {{ form.csrf_token }}
+                    
+                    <input class="border border-1 rounded-2" type="text" name="first_name" id="firstName" placeholder="Enter your first name" autocomplete="off" required>
+                    <input class="border border-1 rounded-2" type="text" name="last_name" id="lastName" placeholder="Enter your last name" autocomplete="off" required>
+                    <input class="border border-1 rounded-2" type="email" name="email" id="userEmail" placeholder="Enter your email" autocomplete="off" required>
+                    <input class="border border-1 rounded-2" type="password" name="password" id="userPass" placeholder="Enter password" autocomplete="off" required>
+                    <select class="border border-1 rounded-2" name="user_type" id="userType" required>
+                        <option value="" disabled selected>Select User Type</option>
+                        <option value="student">Student</option>
+                        <option value="instructor">Instructor</option>
+                        <option value="company">Company Representative</option>
+                    </select>
+                    
+                    <div id="studentFields" style="display: none;">
+                        <input class="border border-1 rounded-2" type="text" name="university" id="university" placeholder="University name">
+                        <input class="border border-1 rounded-2" type="text" name="major" id="major" placeholder="Your major">
+                        <input class="border border-1 rounded-2" type="number" step="0.01" min="0" max="4" name="gpa" id="gpa" placeholder="Your GPA (0-4)">
+                        <input class="border border-1 rounded-2" type="date" name="expected_graduation_date" id="expectedGraduationDate" placeholder="Expected graduation date">
+                    </div>
+                    
+                    <div id="instructorFields" style="display: none;">
+                        <input class="border border-1 rounded-2" type="text" name="department" id="department" placeholder="Department">
+                        <input class="border border-1 rounded-2" type="text" name="specialization" id="specialization" placeholder="Specialization">
+                        <input class="border border-1 rounded-2" type="number" name="experience" id="experience" placeholder="Years of experience">
+                    </div>
+                    
+                    <div id="companyFields" style="display: none;">
+                        <input class="border border-1 rounded-2" type="text" name="company_name" id="companyName" placeholder="Company name">
+                        <input class="border border-1 rounded-2" type="text" name="industry" id="industry" placeholder="Industry">
+                        <input class="border border-1 rounded-2" type="text" name="location" id="location" placeholder="Location">
+                        <select class="border border-1 rounded-2" name="company_size" id="companySize">
+                            <option value="" disabled selected>Company Size</option>
+                            <option value="small">Small (1-50 employees)</option>
+                            <option value="medium">Medium (51-250 employees)</option>
+                            <option value="large">Large (251+ employees)</option>
+                        </select>
+                        <input class="border border-1 rounded-2" type="date" name="founded_date" id="foundedDate" placeholder="Founded date">
+                    </div>
+                    
+                    <div id="required">
+                        <span class="text-danger">{{ form_errors|join(', ') }}</span>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-outline-info text-decoration-none">Sign Up</button>
+                    <label>Already have an account? <a href="{{ url_for('login') }}">Sign In</a></label>
+                </form>
+            </div>
+        </div>
+        
+        <script>
+            // Show/hide additional fields based on user type selection
+            document.getElementById('userType').addEventListener('change', function() {
+                // Hide all special fields
+                document.getElementById('studentFields').style.display = 'none';
+                document.getElementById('instructorFields').style.display = 'none';
+                document.getElementById('companyFields').style.display = 'none';
+                
+                // Show relevant fields based on selection
+                if (this.value === 'student') {
+                    document.getElementById('studentFields').style.display = 'block';
+                } else if (this.value === 'instructor') {
+                    document.getElementById('instructorFields').style.display = 'block';
+                } else if (this.value === 'company') {
+                    document.getElementById('companyFields').style.display = 'block';
+                }
+            });
+        </script>
+    </body>
+</html>

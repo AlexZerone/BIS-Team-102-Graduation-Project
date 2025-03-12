@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta charset="utf-8">
+        <title>Login - Education System</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/resposive.css') }}">
+    </head>
+    <body class="bg-22333c">
+        <div class="smart-app">
+            <div class="login shadow-lg">
+                <h1 class="text-capitalize">Education System Login</h1>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST" action="{{ url_for('login') }}" class="form d-flex flex-column">
+                    {{ form.csrf_token }}
+                    
+                    <input class="border border-1 rounded-2" type="email" name="email" id="userEmail" placeholder="Enter your email" autocomplete="off" required>
+                    <input class="border border-1 rounded-2" type="password" name="password" id="userPass" placeholder="Enter password" autocomplete="off" required>
+                    
+                    <button type="submit" class="btn btn-outline-info text-decoration-none">Login</button>
+                    <label>Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a></label>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>
