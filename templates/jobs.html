@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h2>Job Listings</h2>
+            {% if user_type == 'company' %}
+                <a href="#" class="btn btn-primary mb-3">Post New Job</a>
+            {% endif %}
+            <div class="row">
+                {% if jobs %}
+                    {% for job in jobs %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ job.Title }}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">{{ job.Company }}</h6>
+                                    <p class="card-text">{{ job.Description }}</p>
+                                    <a href="#" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-md-12">
+                        <p>No job listings available.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

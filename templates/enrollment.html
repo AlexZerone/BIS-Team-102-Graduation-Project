@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h2>Course Enrollment</h2>
+            <div class="row">
+                {% if available_courses %}
+                    {% for course in available_courses %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ course.Title }}</h5>
+                                    <p class="card-text">{{ course.Description }}</p>
+                                    <p><strong>Instructor:</strong> {{ course.Instructor }}</p>
+                                    {% if course.Enrolled %}
+                                        <button class="btn btn-secondary" disabled>Enrolled</button>
+                                    {% else %}
+                                        <form method="POST" action="{{ url_for('enroll', course_id=course.CourseID) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-primary">Enroll</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-md-12">
+                        <p>No courses available for enrollment.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

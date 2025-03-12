@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="jumbotron mt-4">
+        <h1 class="display-4">Welcome to Learning Management System</h1>
+        <p class="lead">A platform for students, instructors, and companies to connect and learn.</p>
+        <hr class="my-4">
+        <p>Get started by logging in or creating a new account.</p>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('login') }}" role="button">Login</a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('register') }}" role="button">Register</a>
+    </div>
+</div>
+{% endblock %}

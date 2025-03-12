@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Education System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .signup-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-control {
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .additional-fields {
+        padding: 1rem;
+        margin: 1rem 0;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+    }
+
+    .signup-btn {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1.1rem;
+        margin-top: 1rem;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="signup-container">
+        <h2 class="text-center mb-4">Create Your Account</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('register') }}" id="signupForm">
+            {{ form.csrf_token }}
+
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label for="firstName" class="form-label">First Name</label>
+                    <input class="form-control" type="text" name="first_name" id="firstName" 
+                           placeholder="Enter your first name" required>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <input class="form-control" type="text" name="last_name" id="lastName" 
+                           placeholder="Enter your last name" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="userEmail" class="form-label">Email Address</label>
+                <input class="form-control" type="email" name="email" id="userEmail" 
+                       placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="userPass" class="form-label">Password</label>
+                <input class="form-control" type="password" name="password" id="userPass" 
+                       placeholder="Enter password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="userType" class="form-label">User Type</label>
+                <select class="form-select" name="user_type" id="userType" required>
+                    <option value="" disabled selected>Select User Type</option>
+                    <option value="student">Student</option>
+                    <option value="instructor">Instructor</option>
+                    <option value="company">Company Representative</option>
+                </select>
+            </div>
+
+            <!-- Student Fields -->
+            <div id="studentFields" class="additional-fields" style="display: none;">
+                <h4 class="mb-3">Student Information</h4>
+                <div class="form-group">
+                    <label for="university" class="form-label">University</label>
+                    <input class="form-control" type="text" name="university" id="university" 
+                           placeholder="Enter university name">
+                </div>
+                <div class="form-group">
+                    <label for="major" class="form-label">Major</label>
+                    <input class="form-control" type="text" name="major" id="major" 
+                           placeholder="Enter your major">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label for="gpa" class="form-label">GPA</label>
+                        <input class="form-control" type="number" step="0.01" min="0" max="4" 
+                               name="gpa" id="gpa" placeholder="Enter GPA (0-4)">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="expectedGraduationDate" class="form-label">Expected Graduation</label>
+                        <input class="form-control" type="date" name="expected_graduation_date" 
+                               id="expectedGraduationDate">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructor Fields -->
+            <div id="instructorFields" class="additional-fields" style="display: none;">
+                <h4 class="mb-3">Instructor Information</h4>
+                <div class="form-group">
+                    <label for="department" class="form-label">Department</label>
+                    <input class="form-control" type="text" name="department" id="department" 
+                           placeholder="Enter department">
+                </div>
+                <div class="form-group">
+                    <label for="specialization" class="form-label">Specialization</label>
+                    <input class="form-control" type="text" name="specialization" id="specialization" 
+                           placeholder="Enter specialization">
+                </div>
+                <div class="form-group">
+                    <label for="experience" class="form-label">Years of Experience</label>
+                    <input class="form-control" type="number" name="experience" id="experience" 
+                           placeholder="Enter years of experience">
+                </div>
+            </div>
+
+            <!-- Company Fields -->
+            <div id="companyFields" class="additional-fields" style="display: none;">
+                <h4 class="mb-3">Company Information</h4>
+                <div class="form-group">
+                    <label for="companyName" class="form-label">Company Name</label>
+                    <input class="form-control" type="text" name="company_name" id="companyName" 
+                           placeholder="Enter company name">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label for="industry" class="form-label">Industry</label>
+                        <input class="form-control" type="text" name="industry" id="industry" 
+                               placeholder="Enter industry">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="location" class="form-label">Location</label>
+                        <input class="form-control" type="text" name="location" id="location" 
+                               placeholder="Enter location">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="companySize" class="form-label">Company Size</label>
+                    <select class="form-select" name="company_size" id="companySize">
+                        <option value="" disabled selected>Select Company Size</option>
+                        <option value="small">Small (1-50 employees)</option>
+                        <option value="medium">Medium (51-250 employees)</option>
+                        <option value="large">Large (251+ employees)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="foundedDate" class="form-label">Founded Date</label>
+                    <input class="form-control" type="date" name="founded_date" id="foundedDate">
+                </div>
+            </div>
+
+            {% if form_errors %}
+            <div class="alert alert-danger">
+                {{ form_errors|join(', ') }}
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary signup-btn">Create Account</button>
+            
+            <div class="login-link">
+                Already have an account? <a href="{{ url_for('login') }}">Sign In</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('userType').addEventListener('change', function() {
+    const studentFields = document.getElementById('studentFields');
+    const instructorFields = document.getElementById('instructorFields');
+    const companyFields = document.getElementById('companyFields');
+    
+    // Hide all fields first
+    studentFields.style.display = 'none';
+    instructorFields.style.display = 'none';
+    companyFields.style.display = 'none';
+    
+    // Show relevant fields based on selection
+    switch(this.value) {
+        case 'student':
+            studentFields.style.display = 'block';
+            break;
+        case 'instructor':
+            instructorFields.style.display = 'block';
+            break;
+        case 'company':
+            companyFields.style.display = 'block';
+            break;
+    }
+});
+
+// Form validation
+document.getElementById('signupForm').addEventListener('submit', function(event) {
+    const userType = document.getElementById('userType').value;
+    let isValid = true;
+    
+    // Basic validation example - you can expand this
+    if (userType === 'student') {
+        const gpa = document.getElementById('gpa').value;
+        if (gpa && (gpa < 0 || gpa > 4)) {
+            alert('GPA must be between 0 and 4');
+            isValid = false;
+        }
+    }
+    
+    if (!isValid) {
+        event.preventDefault();
+    }
+});
+</script>
+{% endblock %}
