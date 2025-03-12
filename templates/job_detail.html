@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Job Details - {{ job.Title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .job-header {
+        background-color: #f8f9fa;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+
+    .company-info {
+        border-left: 3px solid #007bff;
+        padding-left: 1rem;
+    }
+
+    .requirements-list {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    .requirements-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .requirements-list li:last-child {
+        border-bottom: none;
+    }
+
+    .application-status {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="job-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h2>{{ job.Title }}</h2>
+                <div class="company-info mt-3">
+                    <h5>{{ job.CompanyName }}</h5>
+                    <p class="mb-1"><i class="fas fa-map-marker-alt"></i> {{ job.Location }}</p>
+                    <p class="mb-1"><i class="fas fa-industry"></i> {{ job.Industry }}</p>
+                    <p class="mb-0"><i class="fas fa-money-bill-wave"></i> {{ job.SalaryRange }}</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-end">
+                {% if session.user_type == 'student' %}
+                    {% if not application %}
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#applyModal">
+                            Apply Now
+                        </button>
+                    {% else %}
+                        <div class="alert alert-info application-status">
+                            Application Status: {{ application.Status }}
+                            <br>
+                            Applied on: {{ application.ApplicationDate.strftime('%Y-%m-%d') }}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Job Description</h5>
+                    <p class="card-text">{{ job.Description }}</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Requirements</h5>
+                    <ul class="requirements-list">
+                        {% for requirement in job.Requirements.split('\n') %}
+                            <li><i class="fas fa-check-circle text-success me-2"></i>{{ requirement }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Job Details</h5>
+                    <p><strong>Type:</strong> {{ job.Type }}</p>
+                    <p><strong>Posted:</strong> {{ job.PostingDate.strftime('%Y-%m-%d') }}</p>
+                    <p><strong>Deadline:</strong> {{ job.DeadlineDate.strftime('%Y-%m-%d') }}</p>
+                    
+                    {% if session.user_type == 'company' %}
+                        <hr>
+                        <h6>Applications Received: {{ job.ApplicationCount }}</h6>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if session.user_type == 'student' and not application %}
+<!-- Apply Modal -->
+<div class="modal fade" id="applyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('apply_job', job_id=job.JobID) }}" method="POST">
+                {{ form.csrf_token }}
+                <div class="modal-header">
+                    <h5 class="modal-title">Apply for {{ job.Title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="resume" class="form-label">Resume/Cover Letter</label>
+                        <textarea class="form-control" id="resume" name="resume" rows="6" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

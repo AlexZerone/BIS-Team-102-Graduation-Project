@@ -1,49 +1,31 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-        <meta charset="utf-8">
-        <title>Welcome - Education System</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/resposive.css') }}">
-        <!-- Font Awesome -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    </head>
-    <body class="bg-22333c">
-        <div class="container">
-            <div class="row vh-100 justify-content-center align-items-center">
-                <div class="col-md-6 text-center text-white">
-                    <h1 class="display-4 mb-4">Education System</h1>
-                    <p class="lead mb-5">Your comprehensive platform for learning, teaching, and career opportunities.</p>
-                    <div class="d-grid gap-3 d-md-flex justify-content-md-center">
-                        <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg px-4">Login</a>
-                        <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg px-4">Sign Up</a>
-                        <a href="{{ url_for('home') }}" class="btn btn-outline-light btn-lg px-4">Browse as Guest</a>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h1>Welcome to our Learning Platform</h1>
+            <div class="card-deck mt-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">For Students</h5>
+                        <p class="card-text">Access courses, assignments, and connect with instructors.</p>
                     </div>
-                    <div class="mt-5">
-                        <div class="row text-center">
-                            <div class="col-md-4">
-                                <i class="fas fa-book-open fa-3x mb-2"></i>
-                                <h5>Learn</h5>
-                            </div>
-                            <div class="col-md-4">
-                                <i class="fas fa-chalkboard-teacher fa-3x mb-2"></i>
-                                <h5>Teach</h5>
-                            </div>
-                            <div class="col-md-4">
-                                <i class="fas fa-briefcase fa-3x mb-2"></i>
-                                <h5>Work</h5>
-                            </div>
-                        </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">For Instructors</h5>
+                        <p class="card-text">Create courses, manage assignments, and interact with students.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">For Companies</h5>
+                        <p class="card-text">Post job opportunities and connect with talented students.</p>
                     </div>
                 </div>
             </div>
         </div>
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    </body>
-</html>
+    </div>
+</div>
+{% endblock %}

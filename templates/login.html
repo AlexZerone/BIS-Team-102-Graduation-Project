@@ -1,39 +1,205 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-        <meta charset="utf-8">
-        <title>Login - Education System</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/resposive.css') }}">
-    </head>
-    <body class="bg-22333c">
-        <div class="smart-app">
-            <div class="login shadow-lg">
-                <h1 class="text-capitalize">Education System Login</h1>
-                
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">{{ message }}</div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-                
-                <form method="POST" action="{{ url_for('login') }}" class="form d-flex flex-column">
-                    {{ form.csrf_token }}
-                    
-                    <input class="border border-1 rounded-2" type="email" name="email" id="userEmail" placeholder="Enter your email" autocomplete="off" required>
-                    <input class="border border-1 rounded-2" type="password" name="password" id="userPass" placeholder="Enter password" autocomplete="off" required>
-                    
-                    <button type="submit" class="btn btn-outline-info text-decoration-none">Login</button>
-                    <label>Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a></label>
-                </form>
-            </div>
+{% extends "base.html" %}
+
+{% block title %}Login - Education System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        max-width: 450px;
+        margin: 4rem auto;
+        padding: 2rem;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .login-header h2 {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control {
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1.1rem;
+        margin: 1rem 0;
+    }
+
+    .signup-link {
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .alert {
+        margin-bottom: 1.5rem;
+    }
+
+    .password-group {
+        position: relative;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+    }
+
+    .social-login {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .social-login-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .social-btn {
+        padding: 0.5rem 1.5rem;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Welcome Back</h2>
+            <p class="text-muted">Please login to your account</p>
         </div>
-    </body>
-</html>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+            {{ form.csrf_token }}
+
+            <div class="form-group">
+                <label for="userEmail" class="form-label">Email Address</label>
+                <input 
+                    class="form-control" 
+                    type="email" 
+                    name="email" 
+                    id="userEmail" 
+                    placeholder="Enter your email"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="userPass" class="form-label">Password</label>
+                <div class="password-group">
+                    <input 
+                        class="form-control" 
+                        type="password" 
+                        name="password" 
+                        id="userPass" 
+                        placeholder="Enter your password"
+                        required
+                    >
+                    <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
+                </div>
+                <div class="d-flex justify-content-end mt-2">
+                    <a href="#" class="text-decoration-none small">Forgot Password?</a>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary login-btn">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </button>
+
+            <div class="signup-link">
+                Don't have an account? <a href="{{ url_for('register') }}" class="text-decoration-none">Sign Up</a>
+            </div>
+
+            <div class="social-login">
+                <p class="text-muted">Or login with</p>
+                <div class="social-login-buttons">
+                    <button type="button" class="btn btn-outline-danger social-btn">
+                        <i class="fab fa-google"></i>
+                        Google
+                    </button>
+                    <button type="button" class="btn btn-outline-primary social-btn">
+                        <i class="fab fa-facebook-f"></i>
+                        Facebook
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password visibility toggle
+    const passwordToggle = document.getElementById('passwordToggle');
+    const passwordInput = document.getElementById('userPass');
+
+    passwordToggle.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    // Form validation
+    const loginForm = document.getElementById('loginForm');
+    loginForm.addEventListener('submit', function(event) {
+        const email = document.getElementById('userEmail').value;
+        const password = passwordInput.value;
+
+        if (!email || !password) {
+            event.preventDefault();
+            alert('Please fill in all fields');
+        }
+    });
+});
+</script>
+{% endblock %}

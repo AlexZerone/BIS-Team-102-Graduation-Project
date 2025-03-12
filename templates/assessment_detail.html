@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Assessment Details{% endblock %}
+
+{% block extra_css %}
+<style>
+    .assessment-header {
+        background-color: #f8f9fa;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+
+    .submission-status {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .submission-list {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .feedback-text {
+        white-space: pre-wrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="assessment-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h2>{{ assessment.Type }}</h2>
+                <p class="text-muted">Course: {{ assessment.CourseTitle }}</p>
+                <p>{{ assessment.Description }}</p>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Assessment Details</h5>
+                        <p><strong>Due Date:</strong> {{ assessment.DueDate.strftime('%Y-%m-%d') }}</p>
+                        <p><strong>Max Score:</strong> {{ assessment.MaxScore }}</p>
+                        <p><strong>Weight:</strong> {{ assessment.Weight }}%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if session.user_type == 'student' %}
+        <div class="row">
+            <div class="col-md-8">
+                {% if submission %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Your Submission</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-{{ 'success' if submission.Status == 'Completed' else 'warning' }} submission-status">
+                                Status: {{ submission.Status }}
+                            </div>
+                            {% if submission.Score %}
+                                <p><strong>Score:</strong> {{ submission.Score }}/{{ assessment.MaxScore }}</p>
+                            {% endif %}
+                            {% if submission.Feedback %}
+                                <h6>Feedback:</h6>
+                                <p class="feedback-text">{{ submission.Feedback }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Submit Assessment</h5>
+                            <form action="{{ url_for('submit_assessment', assess_id=assessment.AssessID) }}" method="POST">
+                                {{ form.csrf_token }}
+                                <div class="mb-3">
+                                    <label for="submission" class="form-label">Your Answer</label>
+                                    <textarea class="form-control" id="submission" name="submission" rows="6" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if session.user_type == 'instructor' and submissions %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Student Submissions</h5>
+            </div>
+            <div class="card-body submission-list">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Submission Date</th>
+                                <th>Status</th>
+                                <th>Score</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for submission in submissions %}
+                                <tr>
+                                    <td>{{ submission.First }} {{ submission.Last }}</td>
+                                    <td>{{ submission.SubmissionDate.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if submission.Status == 'Completed' else 'warning' }}">
+                                            {{ submission.Status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ submission.Score if submission.Score else 'Not graded' }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" 
+                                                onclick="viewSubmission({{ submission.StudentID }})">
+                                            View
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

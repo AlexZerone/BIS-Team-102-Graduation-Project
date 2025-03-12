@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Course Details - {{ course.Title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .course-header {
+        background-color: #f8f9fa;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+
+    .assessment-card {
+        margin-bottom: 1rem;
+        transition: transform 0.2s;
+    }
+
+    .assessment-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .student-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .due-date {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="course-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h2>{{ course.Title }}</h2>
+                <p class="text-muted">Instructor: {{ course.InstructorFirst }} {{ course.InstructorLast }}</p>
+                <p>{{ course.Description }}</p>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Course Details</h5>
+                        <p><strong>Start Date:</strong> {{ course.StartDate.strftime('%Y-%m-%d') }}</p>
+                        <p><strong>End Date:</strong> {{ course.EndDate.strftime('%Y-%m-%d') }}</p>
+                        <p><strong>Type:</strong> {{ course.Type }}</p>
+                        <p><strong>Duration:</strong> {{ course.Duration }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <h3>Assessments</h3>
+            {% if assessments %}
+                {% for assessment in assessments %}
+                    <div class="card assessment-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="card-title">{{ assessment.Type }}</h5>
+                                    <p class="card-text">{{ assessment.Description }}</p>
+                                    <p class="mb-0">
+                                        <span class="badge bg-primary">Max Score: {{ assessment.MaxScore }}</span>
+                                        <span class="badge bg-info">Weight: {{ assessment.Weight }}%</span>
+                                    </p>
+                                </div>
+                                <div class="text-end">
+                                    <p class="due-date">Due: {{ assessment.DueDate.strftime('%Y-%m-%d') }}</p>
+                                    <a href="{{ url_for('assessment_detail', assess_id=assessment.AssessID) }}" 
+                                       class="btn btn-outline-primary btn-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No assessments available for this course.</p>
+            {% endif %}
+        </div>
+
+        {% if enrolled_students %}
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Enrolled Students</h5>
+                </div>
+                <div class="card-body student-list">
+                    <div class="list-group">
+                        {% for student in enrolled_students %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">{{ student.First }} {{ student.Last }}</h6>
+                                        <small class="text-muted">Enrolled: {{ student.RegistrationDate.strftime('%Y-%m-%d') }}</small>
+                                    </div>
+                                    <span class="badge bg-{{ 'success' if student.Status == 'Active' else 'secondary' }} status-badge">
+                                        {{ student.Status }}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
