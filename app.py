@@ -30,7 +30,6 @@ mysql = MySQL(app)
 csrf = CSRFProtect(app)
 
 
-
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -39,6 +38,7 @@ def login_required(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
+
 
 def role_required(allowed_roles):
     def decorator(f):
@@ -51,6 +51,7 @@ def role_required(allowed_roles):
         return decorated_function
     return decorator
 
+
 # ✅ **Forms**
 class RegistrationForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired(), Length(min=2, max=50)])
@@ -60,10 +61,12 @@ class RegistrationForm(FlaskForm):
     user_type = SelectField('User Type', choices=[('student', 'Student'), ('instructor', 'Instructor'), ('company', 'Company')], validators=[DataRequired()])
     submit = SubmitField('Sign Up')
 
+
 class LoginForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
 
 # ✅ **Utility Functions**
 def get_record(query, params=()):
@@ -72,11 +75,13 @@ def get_record(query, params=()):
         cursor.execute(query, params)
         return cursor.fetchone()
 
+
 def get_records(query, params=()):
     """ Fetch multiple records """
     with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
         cursor.execute(query, params)
         return cursor.fetchall()
+
 
 def execute_query(query, params=()):
     """ Execute an INSERT, UPDATE, or DELETE query """
@@ -84,14 +89,55 @@ def execute_query(query, params=()):
         cursor.execute(query, params)
         mysql.connection.commit()
 
+
 # ✅ **Routes**
 @app.route('/')
 def index():
-    return redirect(url_for('login'))
+    # Changed to render home page instead of redirecting to login
+    return render_template('home.html')
+
 
 @app.route('/home')
 def home():
+    if 'user_id' in session:
+        return redirect(url_for('post_home'))
     return render_template('home.html')
+
+
+@app.route('/Post-home')
+@login_required
+def post_home():
+    user_id = session['user_id']
+    user_type = session['user_type']
+    user = get_record('SELECT * FROM users WHERE UserID = %s', (user_id,))
+    
+    # Fetch role-specific data
+    activities = []
+    upcoming_items = []
+    stats = {}
+    
+    # Example for student stats
+    if user_type == 'student':
+        student = get_record('SELECT StudentID FROM students WHERE UserID = %s', (user_id,))
+        if student:
+            student_id = student['StudentID']
+            
+            # Get course count
+            course_count = get_record('SELECT COUNT(*) as count FROM course_registrations WHERE StudentID = %s', (student_id,))
+            stats['enrolled_courses'] = course_count['count'] if course_count else 0
+            
+            # Additional student-specific data fetching can be added here
+
+    # Similar logic can be added for other user types (e.g., instructor, company)
+
+    return render_template('Post-Login Home.html', 
+                          user=user, 
+                          user_type=user_type,
+                          current_date=datetime.now(),
+                          activities=activities,
+                          upcoming_items=upcoming_items,
+                          **stats)
+
 
 # ✅ **Login Route**
 @app.route('/login', methods=['GET', 'POST'])
@@ -100,45 +146,126 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-        user = get_record('SELECT * FROM users WHERE Email = %s', (email,))
-        
+
+        user = get_record('SELECT * FROM users WHERE Email = %s AND Status = "Active"', (email,))
+
         if user and check_password_hash(user['Password'], password):
             session['user_id'] = user['UserID']
             session['user_type'] = user['UserType']
 
-            execute_query('UPDATE users SET LastLoginDate = NOW() WHERE UserID = %s', (user['UserID'],))
+            try:
+                execute_query('UPDATE users SET LastLoginDate = NOW() WHERE UserID = %s', (user['UserID'],))
+            except Exception as e:
+                flash(f"Database error: {str(e)}", "danger")
 
             flash('Login successful!', 'success')
             return redirect(url_for('dashboard'))
         
-        flash('Invalid email or password', 'danger')
+        flash('Invalid email or account not active', 'danger')
     
     return render_template('login.html', form=form)
 
-# ✅ **Register Route**
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        first_name = form.first_name.data
-        last_name = form.last_name.data
-        email = form.email.data
+        first_name = form.first_name.data.strip()
+        last_name = form.last_name.data.strip()
+        email = form.email.data.strip().lower()
         password = form.password.data
         user_type = form.user_type.data
 
+        # Validate user type
+        allowed_user_types = ['student', 'instructor', 'company']
+        if user_type not in allowed_user_types:
+            flash('Invalid user type selected.', 'danger')
+            return redirect(url_for('register'))
+
+        # Check for an existing email
         if get_record('SELECT * FROM users WHERE Email = %s', (email,)):
             flash('Email already registered', 'danger')
             return redirect(url_for('register'))
+
+        try:
+            # Insert the new user into the users table
+            execute_query(
+                'INSERT INTO users (First, Last, Email, Password, UserType, CreatedDate, Status) '
+                'VALUES (%s, %s, %s, %s, %s, NOW(), "Active")',
+                (first_name, last_name, email, generate_password_hash(password), user_type)
+            )
+
+            # Get the newly inserted user
+            new_user = get_record('SELECT * FROM users WHERE Email = %s', (email,))
+            if not new_user:
+                flash('Registration failed. Please try again.', 'danger')
+                return redirect(url_for('register'))
+
+            # Process extra form fields based on the selected user type
+            if user_type == 'student':
+                university = request.form.get('university')
+                major = request.form.get('major')
+                gpa = request.form.get('gpa')
+                expected_graduation_date = request.form.get('expected_graduation_date')
+                
+                # Check for missing fields before updating the student table
+                if not university or not major or not gpa or not expected_graduation_date:
+                    flash('Please fill in all fields for the student.', 'danger')
+                    return redirect(url_for('register'))
+                
+                # Update the student record with additional info
+                execute_query(
+                    'UPDATE students SET University = %s, Major = %s, GPA = %s, ExpectedGraduationDate = %s, UpdatedDate = NOW() '
+                    'WHERE UserID = %s',
+                    (university, major, gpa, expected_graduation_date, new_user['UserID'])
+                )
+            elif user_type == 'instructor':
+                department = request.form.get('department')
+                specialization = request.form.get('specialization')
+                experience = request.form.get('experience')
+
+                # Ensure no fields are missing
+                if not department or not specialization or not experience:
+                    flash('Please fill in all fields for the instructor.', 'danger')
+                    return redirect(url_for('register'))
+                
+                # Update the instructor record with additional info
+                execute_query(
+                    'UPDATE instructors SET Department = %s, Specialization = %s, Experience = %s, UpdatedDate = NOW() '
+                    'WHERE UserID = %s',
+                    (department, specialization, experience, new_user['UserID'])
+                )
+            elif user_type == 'company':
+                company_name = request.form.get('company_name')
+                industry = request.form.get('industry')
+                location = request.form.get('location')
+                company_size = request.form.get('company_size')
+                founded_date = request.form.get('founded_date')
+
+                # Ensure no fields are missing
+                if not company_name or not industry or not location or not company_size or not founded_date:
+                    flash('Please fill in all fields for the company.', 'danger')
+                    return redirect(url_for('register'))
+                
+                # Update the company record with additional info
+                execute_query(
+                    'UPDATE companies SET Name = %s, Industry = %s, Location = %s, CompanySize = %s, FoundedDate = %s, UpdatedDate = NOW() '
+                    'WHERE UserID = %s',
+                    (company_name, industry, location, company_size, founded_date, new_user['UserID'])
+                )
+
+            # Auto-login the user after registration
+            session['user_id'] = new_user['UserID']
+            session['user_type'] = new_user['UserType']
+
+            flash('Registration successful! Welcome!', 'success')
+            return redirect(url_for('dashboard'))
         
-        execute_query(
-            'INSERT INTO users (First, Last, Email, Password, UserType, CreatedDate, Status) VALUES (%s, %s, %s, %s, %s, NOW(), "Active")',
-            (first_name, last_name, email, generate_password_hash(password), user_type)
-        )
-        
-        flash('Registration successful! Please log in.', 'success')
-        return redirect(url_for('login'))
+        except Exception as e:
+            flash(f'Registration failed: {str(e)}', 'danger')
+            return redirect(url_for('register'))
     
     return render_template('signup.html', form=form)
+
 
 # ✅ **Dashboard**
 @app.route('/dashboard')
@@ -162,6 +289,7 @@ def dashboard():
         profile = get_record('SELECT * FROM companies WHERE UserID = %s', (user_id,))
     
     return render_template('dashboard.html', user=user, profile=profile, user_type=user_type)
+
 
 # ✅ **Logout**
 @app.route('/logout')

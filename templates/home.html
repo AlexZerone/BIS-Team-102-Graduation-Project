@@ -1,14 +1,99 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="jumbotron mt-4">
-        <h1 class="display-4">Welcome to Learning Management System</h1>
-        <p class="lead">A platform for students, instructors, and companies to connect and learn.</p>
-        <hr class="my-4">
-        <p>Get started by logging in or creating a new account.</p>
-        <a class="btn btn-primary btn-lg" href="{{ url_for('login') }}" role="button">Login</a>
-        <a class="btn btn-secondary btn-lg" href="{{ url_for('register') }}" role="button">Register</a>
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold text-primary mb-3">Unlock Your Potential</h1>
+            <h2 class="h3 text-secondary mb-4">The Complete Sec Era</h2>
+            <p class="lead mb-4">Connect, learn, and grow with our integrated platform for students, instructors, and industry professionals.</p>
+            <div class="d-flex gap-3 mb-4">
+                <a class="btn btn-primary btn-lg px-4 py-2 shadow-sm" href="{{ url_for('login') }}">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </a>
+                <a class="btn btn-outline-primary btn-lg px-4 py-2" href="{{ url_for('register') }}">
+                    <i class="fas fa-user-plus me-2"></i>Register
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <img src="/static/images/hero-image.jpg" alt="Learning Platform Illustration" class="img-fluid rounded shadow-lg">
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="h2 fw-bold">Why Choose Our Platform?</h2>
+            <p class="text-muted">Everything you need in one place</p>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 d-inline-flex mb-3">
+                        <i class="fas fa-graduation-cap fa-2x text-primary"></i>
+                    </div>
+                    <h3 class="h5 fw-bold">For Students</h3>
+                    <p class="card-text">Access courses, submit assignments, and apply for job opportunities to jumpstart your career.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-flex mb-3">
+                        <i class="fas fa-chalkboard-teacher fa-2x text-success"></i>
+                    </div>
+                    <h3 class="h5 fw-bold">For Instructors</h3>
+                    <p class="card-text">Create and manage courses, evaluate assignments, and track student progress efficiently.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-info bg-opacity-10 p-3 d-inline-flex mb-3">
+                        <i class="fas fa-building fa-2x text-info"></i>
+                    </div>
+                    <h3 class="h5 fw-bold">For Companies</h3>
+                    <p class="card-text">Post job openings, review applications, and connect with qualified candidates from our talent pool.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="row py-4 bg-light rounded-3 shadow-sm mb-5">
+        <div class="col-md-3 text-center mb-3 mb-md-0">
+            <h3 class="display-5 fw-bold text-primary">500+</h3>
+            <p class="text-muted">Active Courses</p>
+        </div>
+        <div class="col-md-3 text-center mb-3 mb-md-0">
+            <h3 class="display-5 fw-bold text-primary">10k+</h3>
+            <p class="text-muted">Students</p>
+        </div>
+        <div class="col-md-3 text-center mb-3 mb-md-0">
+            <h3 class="display-5 fw-bold text-primary">200+</h3>
+            <p class="text-muted">Expert Instructors</p>
+        </div>
+        <div class="col-md-3 text-center">
+            <h3 class="display-5 fw-bold text-primary">150+</h3>
+            <p class="text-muted">Partner Companies</p>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="text-center p-5 bg-primary bg-opacity-10 rounded-3 shadow-sm">
+        <h2 class="fw-bold mb-3">Ready to Get Started?</h2>
+        <p class="lead mb-4">Join our community today and take the next step in your educational journey.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a class="btn btn-primary btn-lg px-4" href="{{ url_for('register') }}">Create Account</a>
+            <a class="btn btn-outline-secondary btn-lg px-4" href="#learn-more">Learn More</a>
+        </div>
     </div>
 </div>
 {% endblock %}
