@@ -3,12 +3,15 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, EmailField, SubmitField, SelectField
-from wtforms.validators import DataRequired, Length, Email
+from wtforms import StringField, PasswordField, EmailField, SubmitField, SelectField, DateField, FloatField, IntegerField
+from wtforms.validators import DataRequired, Length, Email, ValidationError
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_wtf.csrf import CSRFProtect
 from datetime import datetime
 from functools import wraps
+
+
+
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -53,13 +56,94 @@ def role_required(allowed_roles):
 
 
 # ✅ **Forms**
-class RegistrationForm(FlaskForm):
+'''class RegistrationForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired(), Length(min=2, max=50)])
     last_name = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=50)])
     email = EmailField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
     user_type = SelectField('User Type', choices=[('student', 'Student'), ('instructor', 'Instructor'), ('company', 'Company')], validators=[DataRequired()])
-    submit = SubmitField('Sign Up')
+    submit = SubmitField('Sign Up')'''
+
+class RegistrationForm(FlaskForm):
+    first_name = StringField('First Name', validators=[DataRequired(), Length(min=2, max=50)])
+    last_name = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=50)])
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    user_type = SelectField('User Type', 
+                          choices=[('student', 'Student'), 
+                                 ('instructor', 'Instructor'), 
+                                 ('company', 'Company')],
+                          validators=[DataRequired()])
+    
+    # Student fields
+    university = StringField('University')
+    major = StringField('Major')
+    gpa = FloatField('GPA')
+    expected_graduation_date = DateField('Expected Graduation Date', format='%Y-%m-%d')
+    
+    # Instructor fields
+    department = StringField('Department')
+    specialization = StringField('Specialization')
+    experience = IntegerField('Years of Experience')
+    
+    # Company fields
+    company_name = StringField('Company Name')
+    industry = StringField('Industry')
+    location = StringField('Location')
+    company_size = StringField('Company Size')
+    founded_date = DateField('Founded Date', format='%Y-%m-%d')
+
+    def validate(self, *args, **kwargs):
+        initial_validation = super(RegistrationForm, self).validate(*args, **kwargs)
+        if not initial_validation:
+            return False
+
+        if self.user_type.data == 'student':
+            if not self.university.data:
+                self.university.errors.append('University is required for students')
+                return False
+            if not self.major.data:
+                self.major.errors.append('Major is required for students')
+                return False
+            if not self.gpa.data:
+                self.gpa.errors.append('GPA is required for students')
+                return False
+            if not self.expected_graduation_date.data:
+                self.expected_graduation_date.errors.append('Expected graduation date is required for students')
+                return False
+
+        elif self.user_type.data == 'instructor':
+            if not self.department.data:
+                self.department.errors.append('Department is required for instructors')
+                return False
+            if not self.specialization.data:
+                self.specialization.errors.append('Specialization is required for instructors')
+                return False
+            if not self.experience.data:
+                self.experience.errors.append('Years of experience is required for instructors')
+                return False
+
+        elif self.user_type.data == 'company':
+            if not self.company_name.data:
+                self.company_name.errors.append('Company name is required')
+                return False
+            if not self.industry.data:
+                self.industry.errors.append('Industry is required')
+                return False
+            if not self.location.data:
+                self.location.errors.append('Location is required')
+                return False
+            if not self.company_size.data:
+                self.company_size.errors.append('Company size is required')
+                return False
+            if not self.founded_date.data:
+                self.founded_date.errors.append('Founded date is required')
+                return False
+
+        return True
+
+
+
 
 
 class LoginForm(FlaskForm):
@@ -168,106 +252,99 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
-    if form.validate_on_submit():
-        first_name = form.first_name.data.strip()
-        last_name = form.last_name.data.strip()
-        email = form.email.data.strip().lower()
-        password = form.password.data
-        user_type = form.user_type.data
-
-        # Validate user type
-        allowed_user_types = ['student', 'instructor', 'company']
-        if user_type not in allowed_user_types:
-            flash('Invalid user type selected.', 'danger')
-            return redirect(url_for('register'))
-
-        # Check for an existing email
-        if get_record('SELECT * FROM users WHERE Email = %s', (email,)):
-            flash('Email already registered', 'danger')
-            return redirect(url_for('register'))
-
+    if request.method == 'POST':
         try:
-            # Insert the new user into the users table
-            execute_query(
-                'INSERT INTO users (First, Last, Email, Password, UserType, CreatedDate, Status) '
-                'VALUES (%s, %s, %s, %s, %s, NOW(), "Active")',
-                (first_name, last_name, email, generate_password_hash(password), user_type)
+            # Start transaction
+            cursor = mysql.connection.cursor()
+            
+            # Insert user
+            insert_user_sql = """
+                INSERT INTO users (First, Last, Email, Password, UserType)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            user_data = (
+                request.form['first_name'],
+                request.form['last_name'],
+                request.form['email'],
+                generate_password_hash(request.form['password']),
+                request.form['user_type']
             )
-
-            # Get the newly inserted user
-            new_user = get_record('SELECT * FROM users WHERE Email = %s', (email,))
-            if not new_user:
-                flash('Registration failed. Please try again.', 'danger')
-                return redirect(url_for('register'))
-
-            # Process extra form fields based on the selected user type
+            
+            cursor.execute(insert_user_sql, user_data)
+            user_id = cursor.lastrowid
+            
+            # Handle role-specific registration
+            user_type = request.form['user_type']
+            
             if user_type == 'student':
-                university = request.form.get('university')
-                major = request.form.get('major')
-                gpa = request.form.get('gpa')
-                expected_graduation_date = request.form.get('expected_graduation_date')
-                
-                # Check for missing fields before updating the student table
-                if not university or not major or not gpa or not expected_graduation_date:
-                    flash('Please fill in all fields for the student.', 'danger')
-                    return redirect(url_for('register'))
-                
-                # Update the student record with additional info
-                execute_query(
-                    'UPDATE students SET University = %s, Major = %s, GPA = %s, ExpectedGraduationDate = %s, UpdatedDate = NOW() '
-                    'WHERE UserID = %s',
-                    (university, major, gpa, expected_graduation_date, new_user['UserID'])
+                insert_student_sql = """
+                    INSERT INTO students (UserID, University, Major, GPA, ExpectedGraduationDate)
+                    VALUES (%s, %s, %s, %s, %s)
+                """
+                student_data = (
+                    user_id,
+                    request.form.get('university'),
+                    request.form.get('major'),
+                    request.form.get('gpa'),
+                    request.form.get('expected_graduation_date')
                 )
+                cursor.execute(insert_student_sql, student_data)
+                
             elif user_type == 'instructor':
-                department = request.form.get('department')
-                specialization = request.form.get('specialization')
-                experience = request.form.get('experience')
-
-                # Ensure no fields are missing
-                if not department or not specialization or not experience:
-                    flash('Please fill in all fields for the instructor.', 'danger')
-                    return redirect(url_for('register'))
-                
-                # Update the instructor record with additional info
-                execute_query(
-                    'UPDATE instructors SET Department = %s, Specialization = %s, Experience = %s, UpdatedDate = NOW() '
-                    'WHERE UserID = %s',
-                    (department, specialization, experience, new_user['UserID'])
+                insert_instructor_sql = """
+                    INSERT INTO instructors (UserID, Department, Specialization, Experience)
+                    VALUES (%s, %s, %s, %s)
+                """
+                instructor_data = (
+                    user_id,
+                    request.form.get('department'),
+                    request.form.get('specialization'),
+                    request.form.get('experience')
                 )
+                cursor.execute(insert_instructor_sql, instructor_data)
+                
             elif user_type == 'company':
-                company_name = request.form.get('company_name')
-                industry = request.form.get('industry')
-                location = request.form.get('location')
-                company_size = request.form.get('company_size')
-                founded_date = request.form.get('founded_date')
-
-                # Ensure no fields are missing
-                if not company_name or not industry or not location or not company_size or not founded_date:
-                    flash('Please fill in all fields for the company.', 'danger')
-                    return redirect(url_for('register'))
-                
-                # Update the company record with additional info
-                execute_query(
-                    'UPDATE companies SET Name = %s, Industry = %s, Location = %s, CompanySize = %s, FoundedDate = %s, UpdatedDate = NOW() '
-                    'WHERE UserID = %s',
-                    (company_name, industry, location, company_size, founded_date, new_user['UserID'])
+                insert_company_sql = """
+                    INSERT INTO companies (UserID, Name, Industry, Location, CompanySize, FoundedDate)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """
+                company_data = (
+                    user_id,
+                    request.form.get('company_name'),
+                    request.form.get('industry'),
+                    request.form.get('location'),
+                    request.form.get('company_size'),
+                    request.form.get('founded_date')
                 )
-
-            # Auto-login the user after registration
-            session['user_id'] = new_user['UserID']
-            session['user_type'] = new_user['UserType']
-
-            flash('Registration successful! Welcome!', 'success')
+                cursor.execute(insert_company_sql, company_data)
+            
+            # Commit the transaction
+            mysql.connection.commit()
+            
+            # Set session
+            session['user_id'] = user_id
+            session['user_type'] = user_type
+            
+            flash('Registration successful!', 'success')
             return redirect(url_for('dashboard'))
-        
+            
         except Exception as e:
-            flash(f'Registration failed: {str(e)}', 'danger')
-            return redirect(url_for('register'))
-    
+            # Rollback in case of error
+            mysql.connection.rollback()
+            print(f"Registration error: {str(e)}")  # For debugging
+            flash('Registration failed. Please try again.', 'danger')
+            return render_template('signup.html', form=form)
+        
+        finally:
+            cursor.close()
+            
     return render_template('signup.html', form=form)
 
 
-# ✅ **Dashboard**
+
+
+
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -275,20 +352,26 @@ def dashboard():
         flash('Please log in to access the dashboard', 'warning')
         return redirect(url_for('login'))
     
-    user_id = session['user_id']
-    user_type = session['user_type']
+    try:
+        user_id = session['user_id']
+        user_type = session['user_type']
 
-    user = get_record('SELECT * FROM users WHERE UserID = %s', (user_id,))
-    profile = None
+        user = get_record('SELECT * FROM users WHERE UserID = %s', (user_id,))
+        profile = None
 
-    if user_type == 'student':
-        profile = get_record('SELECT * FROM students WHERE UserID = %s', (user_id,))
-    elif user_type == 'instructor':
-        profile = get_record('SELECT * FROM instructors WHERE UserID = %s', (user_id,))
-    elif user_type == 'company':
-        profile = get_record('SELECT * FROM companies WHERE UserID = %s', (user_id,))
+        if user_type == 'student':
+            profile = get_record('SELECT * FROM students WHERE UserID = %s', (user_id,))
+        elif user_type == 'instructor':
+            profile = get_record('SELECT * FROM instructors WHERE UserID = %s', (user_id,))
+        elif user_type == 'company':
+            profile = get_record('SELECT * FROM companies WHERE UserID = %s', (user_id,))
+        
+        return render_template('dashboard.html', user=user, profile=profile, user_type=user_type)
     
-    return render_template('dashboard.html', user=user, profile=profile, user_type=user_type)
+    except Exception as e:
+        flash(f'Error loading dashboard: {str(e)}', 'danger')
+        return redirect(url_for('home'))
+
 
 
 # ✅ **Logout**
