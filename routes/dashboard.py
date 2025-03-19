@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, Blueprint
+from flask import render_template, request, redirect, url_for, flash, session, Blueprint
 from models import get_record, get_records, execute_query
 from permissions import login_required, role_required
-from extensions import mysql
 
 
 
@@ -34,10 +33,5 @@ def dashboard():
     except Exception as e:
         flash(f'Error loading dashboard: {str(e)}', 'danger')
         return redirect(url_for('home.home'))
-
-
-
-
-
 
 

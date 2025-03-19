@@ -8,7 +8,7 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
             flash('Please log in to access this page', 'warning')
-            return redirect(url_for('login'))
+            return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -18,7 +18,7 @@ def role_required(allowed_roles):
         def decorated_function(*args, **kwargs):
             if 'user_type' not in session or session['user_type'] not in allowed_roles:
                 flash('You do not have permission to access this page', 'danger')
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('dashboard.dashboard'))
             return f(*args, **kwargs)
         return decorated_function
     return decorator

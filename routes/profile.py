@@ -12,6 +12,7 @@ profile_bp = Blueprint('profile', __name__)
 
 # Profile Management
 @profile_bp.route('/profile', methods=['GET', 'POST'])
+@login_required
 def profile():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))

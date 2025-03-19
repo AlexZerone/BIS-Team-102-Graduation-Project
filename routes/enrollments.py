@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, Blueprint
+from flask import render_template, request, redirect, url_for, flash, session, Blueprint
 from models import get_record, get_records, execute_query
 from permissions import login_required, role_required
-from extensions import mysql
 
 
 
@@ -12,6 +11,7 @@ enrollments_bp = Blueprint('enrollments', __name__)
 # ✅ **Optimized Enrollment Route**
 @enrollments_bp.route('/enrollment', methods=['GET', 'POST'])
 @login_required
+@role_required(['student'])
 def enrollment():
     if 'user_id' not in session:
         flash('Please log in to access enrollment', 'warning')

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, Blueprint
+from flask import render_template, request, redirect, url_for, flash, session, Blueprint
 from models import get_record, get_records, execute_query
 from permissions import login_required, role_required
 from extensions import mysql
@@ -62,6 +62,8 @@ def jobs():
 
 
 @jobs_bp.route('/job/<int:job_id>')
+@login_required
+@role_required(['student', 'company'])
 def job_detail(job_id):
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
@@ -96,6 +98,8 @@ def job_detail(job_id):
         return redirect(url_for('jobs.jobs'))
 
 @jobs_bp.route('/apply-job/<int:job_id>', methods=['POST'])
+@login_required
+@role_required(['student'])
 def apply_job(job_id):
     if 'user_id' not in session or session['user_type'] != 'student':
         return redirect(url_for('auth.login'))

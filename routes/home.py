@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, Blueprint
+from flask import render_template, request, redirect, url_for, flash, session, Blueprint
 from datetime import datetime
 from models import get_record, get_records, execute_query
 from permissions import login_required, role_required

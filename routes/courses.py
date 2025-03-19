@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, Blueprint
+from flask import render_template, request, redirect, url_for, flash, session, Blueprint
 from models import get_record, get_records, execute_query
 from permissions import login_required, role_required
-from extensions import mysql
+
 
 
 courses_bp = Blueprint('courses', __name__)
@@ -41,6 +41,7 @@ def courses():
 
 
 @courses_bp.route('/course/<int:course_id>')
+@login_required
 def course_detail(course_id):
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))

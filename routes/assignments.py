@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, Blueprint
+from flask import render_template, request, redirect, url_for, flash, session, Blueprint
 from models import get_record, get_records, execute_query
 from permissions import login_required, role_required
 from extensions import mysql
@@ -70,6 +70,8 @@ def assignments():
 
 
 @assignments_bp.route('/assessment/<int:assess_id>')
+@login_required
+@role_required(['student', 'instructor'])
 def assessment_detail(assess_id):
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))

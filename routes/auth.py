@@ -1,38 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, Blueprint
+from flask import render_template, request, redirect, url_for, flash, session, Blueprint
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegistrationForm
 from models import get_record, execute_query
 from permissions import login_required, role_required
 from extensions import mysql
 
+
+
 auth_bp = Blueprint('auth', __name__)
 
-
-# ✅ **Login Route**
-@auth_bp.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-
-        user = get_record('SELECT * FROM users WHERE Email = %s AND Status = "Active"', (email,))
-
-        if user and check_password_hash(user['Password'], password):
-            session['user_id'] = user['UserID']
-            session['user_type'] = user['UserType']
-
-            try:
-                execute_query('UPDATE users SET LastLoginDate = NOW() WHERE UserID = %s', (user['UserID'],))
-            except Exception as e:
-                flash(f"Database error: {str(e)}", "danger")
-
-            flash('Login successful!', 'success')
-            return redirect(url_for('dashboard.dashboard'))
-        
-        flash('Invalid email or account not active', 'danger')
-    
-    return render_template('login.html', form=form)
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -127,7 +103,33 @@ def register():
 
 
 
-# ✅ **Logout**
+@auth_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+
+        user = get_record('SELECT * FROM users WHERE Email = %s AND Status = "Active"', (email,))
+
+        if user and check_password_hash(user['Password'], password):
+            session['user_id'] = user['UserID']
+            session['user_type'] = user['UserType']
+
+            try:
+                execute_query('UPDATE users SET LastLoginDate = NOW() WHERE UserID = %s', (user['UserID'],))
+            except Exception as e:
+                flash(f"Database error: {str(e)}", "danger")
+
+            flash('Login successful!', 'success')
+            return redirect(url_for('dashboard.dashboard'))
+        
+        flash('Invalid email or account not active', 'danger')
+    
+    return render_template('login.html', form=form)
+
+
+
 @auth_bp.route('/logout')
 @login_required
 def logout():

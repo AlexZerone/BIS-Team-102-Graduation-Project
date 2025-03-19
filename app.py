@@ -1,12 +1,9 @@
 # app.py
-from flask import Flask, render_template, request, redirect, url_for, flash, session, blueprints
-from flask_mysqldb import MySQL
+from flask import Flask
 from flask_wtf.csrf import CSRFProtect
-from functools import wraps
 
 from config import Config
 from extensions import mysql
-from permissions import login_required, role_required
 
 from routes.auth import auth_bp
 from routes.home import home_bp
@@ -24,7 +21,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # Initialize MySQL and CSRF protection
-mysql.init_app(app)  # ✅ Initialize MySQL here
+mysql.init_app(app)  
 csrf = CSRFProtect(app)
 
 
