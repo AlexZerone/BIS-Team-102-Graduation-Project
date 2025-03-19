@@ -9,10 +9,10 @@
             <h2 class="h3 text-secondary mb-4">The Complete Sec Era</h2>
             <p class="lead mb-4">Connect, learn, and grow with our integrated platform for students, instructors, and industry professionals.</p>
             <div class="d-flex gap-3 mb-4">
-                <a class="btn btn-primary btn-lg px-4 py-2 shadow-sm" href="{{ url_for('login') }}">
+                <a class="btn btn-primary btn-lg px-4 py-2 shadow-sm" href="{{ url_for('auth.login') }}">
                     <i class="fas fa-sign-in-alt me-2"></i>Login
                 </a>
-                <a class="btn btn-outline-primary btn-lg px-4 py-2" href="{{ url_for('register') }}">
+                <a class="btn btn-outline-primary btn-lg px-4 py-2" href="{{ url_for('auth.register') }}">
                     <i class="fas fa-user-plus me-2"></i>Register
                 </a>
             </div>
@@ -91,7 +91,7 @@
         <h2 class="fw-bold mb-3">Ready to Get Started?</h2>
         <p class="lead mb-4">Join our community today and take the next step in your educational journey.</p>
         <div class="d-flex justify-content-center gap-3">
-            <a class="btn btn-primary btn-lg px-4" href="{{ url_for('register') }}">Create Account</a>
+            <a class="btn btn-primary btn-lg px-4" href="{{ url_for('auth.register') }}">Create Account</a>
             <a class="btn btn-outline-secondary btn-lg px-4" href="#learn-more">Learn More</a>
         </div>
     </div>

@@ -17,7 +17,7 @@
                                     {% if course.Enrolled %}
                                         <button class="btn btn-secondary" disabled>Enrolled</button>
                                     {% else %}
-                                        <form method="POST" action="{{ url_for('enroll', course_id=course.CourseID) }}">
+                                        <form method="POST" action="{{ url_for('enrollments.enroll', course_id=course.CourseID) }}">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <button type="submit" class="btn btn-primary">Enroll</button>
                                         </form>

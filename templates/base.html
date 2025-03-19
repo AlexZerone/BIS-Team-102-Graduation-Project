@@ -51,7 +51,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('home') }}">
+            <a class="navbar-brand" href="{{ url_for('home.home') }}">
                 <i class="fas fa-graduation-cap"></i> SE
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -63,30 +63,30 @@
                     {% if 'user_id' in session %}
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" 
-                               href="{{ url_for('dashboard') }}">Dashboard</a>
+                               href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'courses' %}active{% endif %}" 
-                               href="{{ url_for('courses') }}">Courses</a>
+                               href="{{ url_for('courses.courses') }}">Courses</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'assignments' %}active{% endif %}" 
-                               href="{{ url_for('assignments') }}">Assignments</a>
+                               href="{{ url_for('assignments.assignments') }}">Assignments</a>
                         </li>
                         {% if session.get('user_type') == 'student' %}
                             <li class="nav-item">
                                 <a class="nav-link {% if request.endpoint == 'jobs' %}active{% endif %}" 
-                                   href="{{ url_for('jobs') }}">Jobs</a>
+                                   href="{{ url_for('jobs.jobs') }}">Jobs</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if request.endpoint == 'enrollment' %}active{% endif %}" 
-                                   href="{{ url_for('enrollment') }}">Enrollment</a>
+                                   href="{{ url_for('enrollments.enrollment') }}">Enrollment</a>
                             </li>
                         {% endif %}
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'home' %}active{% endif %}" 
-                               href="{{ url_for('home') }}">Home</a>
+                               href="{{ url_for('home.home') }}">Home</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -98,19 +98,19 @@
                                 <i class="fas fa-user"></i> Account
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('dashboard') }}">Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('dashboard.dashboard') }}">Profile</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
                             </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'login' %}active{% endif %}" 
-                               href="{{ url_for('login') }}">Login</a>
+                               href="{{ url_for('auth.login') }}">Login</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'register' %}active{% endif %}" 
-                               href="{{ url_for('register') }}">Register</a>
+                               href="{{ url_for('auth.register') }}">Register</a>
                         </li>
                     {% endif %}
                 </ul>
