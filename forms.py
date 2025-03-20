@@ -1,10 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, EmailField, SubmitField, SelectField, DateField, FloatField, IntegerField
-from wtforms.validators import DataRequired, Length, Email, ValidationError
+from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 
-
-# ✅ **Forms**
+# Auth Forms
 class RegistrationForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired(), Length(min=2, max=50)])
     last_name = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=50)])
@@ -89,3 +88,16 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 
+
+
+# Profile Form
+class ProfileForm(FlaskForm):
+    first_name = StringField('First Name', validators=[DataRequired()])
+    last_name = StringField('Last Name', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+
+class PasswordChangeForm(FlaskForm):
+    current_password = PasswordField('Current Password', validators=[DataRequired()])
+    new_password = PasswordField('New Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', 
+                                   validators=[DataRequired(), EqualTo('new_password')])

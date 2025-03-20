@@ -1,125 +1,93 @@
-var userNameInput = document.getElementById("userName");
-var userEmailInput = document.getElementById("userEmail");
-var userPassInput = document.getElementById("userPass");
 
-var signEmailInput = document.getElementById("signEmail");
-var signPassInput = document.getElementById("signPass");
-
-// var users=[];
-var users ;
-//there is no data stored 
-if(localStorage.getItem("usersList")==null){
-    var users=[];
-}
-else{
-    users = JSON.parse(localStorage.getItem("usersList"));
-}
-function addUser(){
-    if(!checkIsEmpty()){
-        if(exist()){
-            displayExist();
-        }
-        else{
-        var user = {
-            name:userNameInput.value,
-            email:userEmailInput.value,
-            password:userPassInput.value,
-        }
-        users.push(user);
-        localStorage.setItem("usersList",JSON.stringify(users));
-        displaySucess()
-        
-    }
-        
-    }
-    else{
-        displayRequired();
-    }
-   
-   
-};
-function  welcome(){
-    document.getElementById("welcome").innerHTML = `Welcome ${JSON.parse(localStorage.getItem("homeList"))}`;
-    console.log("5raaaa");
-};
-function exist(){
-    for(var i=0;i<users.length;i++){
-        if(users[i].email==userEmailInput.value ){
-            return true; 
-        }
-    }
-    return false;
-}
-function existLogin(){
-for(var i=0;i<users.length;i++){
-    if(users[i].email==signEmailInput.value && users[i].password==signPassInput.value){
-        console.log(users[i].name);
-        var name=users[i].name;
-        localStorage.setItem("homeList",JSON.stringify(name));
-        location.replace("home.html");
-        
-        
-       
-        console.log("3lam");
-       return true;
-    }
-}
-};
-function searchUser(){
-    if(checkIsEmptySign()){
-        displayRequiredSign();
-        console.log("5raba 2nta");
-    }
-    else{
-        if( existLogin()){
-
-        }
-        else{
-            displayIncorrect();
-        }
-        
+// Error Handler
+class ErrorHandler {
+    static init() {
+        window.addEventListener('error', this.handleError);
+        window.addEventListener('unhandledrejection', this.handlePromiseError);
     }
 
-};
-function clearForm(){
-   userNameInput.value="";
-   userEmailInput.value="";
-   userPassInput.value="";
-  
-//    console.log("Done ya m3lm");
-};
+    static handleError(error) {
+        console.error('Error:', error);
+        this.showErrorMessage();
+    }
 
-function checkIsEmpty(){
-    if(userNameInput.value!="" && userPassInput.value !="" && userEmailInput.value !=""){
-        return false;
+    static handlePromiseError(event) {
+        console.error('Promise Error:', event.reason);
+        this.showErrorMessage();
     }
-    else{
-        return true;
-    }
-}
-function checkIsEmptySign(){
-    if(signEmailInput.value =="" || signPassInput.value =="" ){
-        return true;
-    }
-    else{
-        return false;
+
+    static showErrorMessage() {
+        const errorContainer = document.createElement('div');
+        errorContainer.className = 'alert alert-danger alert-dismissible fade show';
+        errorContainer.innerHTML = `
+            <strong>Oops!</strong> Something went wrong. Please try again later.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.querySelector('.alert-container').appendChild(errorContainer);
     }
 }
 
-// email already exists
-function displayRequired(){
-    document.getElementById("required").innerHTML=`<span class=' text-danger'>All inputs is required</span>`;
-};
-function displayExist(){
-    document.getElementById("required").innerHTML=`<span class=' text-danger'>email already exists</span>`;
+// Performance Monitor
+const performanceMonitor = {
+    init() {
+        this.measurePageLoad();
+        this.measureNetworkRequests();
+    },
 
+    measurePageLoad() {
+        window.addEventListener('load', () => {
+            const timing = performance.timing;
+            const pageLoadTime = timing.loadEventEnd - timing.navigationStart;
+            console.log(`Page Load Time: ${pageLoadTime}ms`);
+        });
+    },
+
+    measureNetworkRequests() {
+        const observer = new PerformanceObserver((list) => {
+            list.getEntries().forEach(entry => {
+                console.log(`Resource Load Time: ${entry.name} - ${entry.duration}ms`);
+            });
+        });
+        observer.observe({ entryTypes: ['resource'] });
+    }
 };
-function displayIncorrect(){
-    document.getElementById("result-sign").innerHTML=`<span class=' text-danger'>incorrect email or password</span>`;
-};
-function displayRequiredSign(){
-    document.getElementById("result-sign").innerHTML=`<span class=' text-danger'>All inputs is required</span>`;
-};
-function displaySucess(){
-    document.getElementById("required").innerHTML=`<span class=' text-success'>Success</span>`;
-};
+
+// Initialize
+$(document).ready(function() {
+    // Auto-hide flash messages
+    setTimeout(function() {
+        $('.alert').fadeOut('slow');
+    }, 5000);
+
+    // Loading state handling
+    $(document).on({
+        ajaxStart: function() { $('#loading-spinner').show(); },
+        ajaxStop: function() { $('#loading-spinner').hide(); }
+    });
+
+    // Theme switcher
+    $('#themeSwitcher').click(function() {
+        $('body').toggleClass('dark-theme');
+        localStorage.setItem('theme', 
+            $('body').hasClass('dark-theme') ? 'dark' : 'light'
+        );
+    });
+
+    // Check saved theme
+    if (localStorage.getItem('theme') === 'dark') {
+        $('body').addClass('dark-theme');
+    }
+
+    // Initialize error handler and performance monitor
+    ErrorHandler.init();
+    performanceMonitor.init();
+});
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => console.log('ServiceWorker registered'))
+            .catch(err => console.log('ServiceWorker registration failed:', err));
+    });
+}

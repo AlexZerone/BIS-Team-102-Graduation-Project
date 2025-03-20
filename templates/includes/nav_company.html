@@ -1,0 +1,21 @@
+<ul class="navbar-nav me-auto">
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'dashboard.company_dashboard' %}active{% endif %}" 
+           href="{{ url_for('dashboard.dashboard') }}">
+           <i class="fas fa-building"></i> Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'jobs.manage_jobs' %}active{% endif %}" 
+           href="{{ url_for('jobs.manage_jobs') }}">
+           <i class="fas fa-briefcase"></i> Manage Jobs
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'applications.view_applications' %}active{% endif %}" 
+           href="{{ url_for('applications.view_applications') }}">
+           <i class="fas fa-file-alt"></i> Applications
+        </a>
+    </li>
+</ul>
+

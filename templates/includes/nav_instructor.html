@@ -1,0 +1,27 @@
+<ul class="navbar-nav me-auto">
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}" 
+           href="{{ url_for('dashboard.dashboard') }}">
+           <i class="fas fa-chalkboard-teacher"></i> Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'courses.manage_courses' %}active{% endif %}" 
+           href="{{ url_for('courses.manage_courses') }}">
+           <i class="fas fa-book-open"></i> My Courses
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'assignments.manage_assignments' %}active{% endif %}" 
+           href="{{ url_for('assignments.manage_assignments') }}">
+           <i class="fas fa-clipboard-check"></i> Assignments
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'grades.manage_grades' %}active{% endif %}" 
+           href="{{ url_for('grades.manage_grades') }}">
+           <i class="fas fa-star"></i> Grades
+        </a>
+    </li>
+</ul>
+
