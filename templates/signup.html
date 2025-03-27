@@ -3,185 +3,192 @@
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">Create Account</h3>
                 </div>
                 <div class="card-body">
-                    <!-- Display Flash Messages -->
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
+                    <!-- Flash Messages -->
+                    {% include '_flash_messages.html' %}
 
                     <form method="POST" class="needs-validation" novalidate>
-                        {{ form.csrf_token }}
+                        {{ form.csrf_token() }}
 
                         <!-- Progress Indicator -->
                         <div class="progress mb-4" style="height: 3px;">
                             <div class="progress-bar" role="progressbar" style="width: 0%;" id="formProgress"></div>
                         </div>
 
-                        <!-- Basic Information Section -->
-                        <div class="row mb-4">
+                        <!-- Common Fields -->
+                        <div class="row g-3 mb-4">
                             <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    {{ form.first_name(class="form-control", placeholder="First Name", required=true) }}
+                                <div class="form-floating">
+                                    {{ form.first_name(class="form-control", placeholder="First Name") }}
                                     {{ form.first_name.label }}
                                     <div class="invalid-feedback">
-                                        Please enter your first name.
+                                        Valid first name is required
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    {{ form.last_name(class="form-control", placeholder="Last Name", required=true) }}
+                                <div class="form-floating">
+                                    {{ form.last_name(class="form-control", placeholder="Last Name") }}
                                     {{ form.last_name.label }}
                                     <div class="invalid-feedback">
-                                        Please enter your last name.
+                                        Valid last name is required
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="form-floating mb-3">
-                            {{ form.email(class="form-control", placeholder="Email", required=true) }}
-                            {{ form.email.label }}
-                            <div class="invalid-feedback">
-                                Please enter a valid email address.
-                            </div>
-                        </div>
-
-                        <div class="form-floating mb-3">
-                            {{ form.password(class="form-control", placeholder="Password", required=true) }}
-                            {{ form.password.label }}
-                            <div class="invalid-feedback">
-                                Password must be at least 6 characters long.
-                            </div>
-                        </div>
-
-                        <!-- Password Strength Indicator -->
-                        <div class="mb-3">
-                            <div class="password-strength" id="passwordStrength">
-                                <div class="progress" style="height: 5px;">
-                                    <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                                </div>
-                                <small class="text-muted">Password strength: <span id="strengthText">None</span></small>
                             </div>
                         </div>
 
                         <div class="form-floating mb-4">
-                            {{ form.user_type(class="form-control", required=true) }}
+                            {{ form.email(class="form-control", placeholder="name@example.com") }}
+                            {{ form.email.label }}
+                            <div class="invalid-feedback">
+                                Please enter a valid email address
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            {{ form.password(class="form-control", placeholder="Password") }}
+                            {{ form.password.label }}
+                            <div class="invalid-feedback">
+                                Password must be at least 8 characters
+                            </div>
+                        </div>
+
+                        <!-- Password Strength -->
+                        <div class="mb-4">
+                            <div class="password-strength">
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Strength: <span id="strengthText">Weak</span>
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- User Type Selection -->
+                        <div class="form-floating mb-4">
+                            {{ form.user_type(class="form-select", id="userType") }}
                             {{ form.user_type.label }}
                         </div>
 
                         <!-- Student Fields -->
-                        <div id="student-fields" class="role-fields" style="display: none;">
-                            <h4 class="mb-3">Student Information</h4>
-                            <div class="row">
+                        <div id="studentFields" class="role-section" style="display: none;">
+                            <h5 class="mb-3 text-primary">Student Information</h5>
+                            <div class="row g-3">
                                 <div class="col-md-6">
-                                    <div class="form-floating mb-3">
+                                    <div class="form-floating">
                                         {{ form.university(class="form-control", placeholder="University") }}
                                         {{ form.university.label }}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-floating mb-3">
+                                    <div class="form-floating">
                                         {{ form.major(class="form-control", placeholder="Major") }}
                                         {{ form.major.label }}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-floating mb-3">
-                                        {{ form.gpa(class="form-control", placeholder="GPA", type="number", step="0.01", min="0", max="4") }}
+                                    <div class="form-floating">
+                                        {{ form.gpa(class="form-control", placeholder="GPA", min="0", max="4", step="0.01") }}
                                         {{ form.gpa.label }}
+                                        <div class="invalid-feedback">
+                                            GPA must be between 0.00 and 4.00
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-floating mb-3">
-                                        {{ form.expected_graduation_date(class="form-control", type="date") }}
-                                        {{ form.expected_graduation_date.label }}
+                                    <div class="form-floating">
+                                        {{ form.expected_graduation(class="form-control") }}
+                                        {{ form.expected_graduation.label }}
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Instructor Fields -->
-                        <div id="instructor-fields" class="role-fields" style="display: none;">
-                            <h4 class="mb-3">Instructor Information</h4>
-                            <div class="row">
+                        <div id="instructorFields" class="role-section" style="display: none;">
+                            <h5 class="mb-3 text-primary">Instructor Information</h5>
+                            <div class="row g-3">
                                 <div class="col-md-6">
-                                    <div class="form-floating mb-3">
+                                    <div class="form-floating">
                                         {{ form.department(class="form-control", placeholder="Department") }}
                                         {{ form.department.label }}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-floating mb-3">
+                                    <div class="form-floating">
                                         {{ form.specialization(class="form-control", placeholder="Specialization") }}
                                         {{ form.specialization.label }}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-floating mb-3">
-                                {{ form.experience(class="form-control", type="number", min="0", placeholder="Years of Experience") }}
-                                {{ form.experience.label }}
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        {{ form.experience(class="form-control", placeholder="Experience", min="0") }}
+                                        {{ form.experience.label }}
+                                        <div class="invalid-feedback">
+                                            Please enter valid years of experience
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Company Fields -->
-                        <div id="company-fields" class="role-fields" style="display: none;">
-                            <h4 class="mb-3">Company Information</h4>
-                            <div class="row">
+                        <div id="companyFields" class="role-section" style="display: none;">
+                            <h5 class="mb-3 text-primary">Company Information</h5>
+                            <div class="row g-3">
                                 <div class="col-md-6">
-                                    <div class="form-floating mb-3">
+                                    <div class="form-floating">
                                         {{ form.company_name(class="form-control", placeholder="Company Name") }}
                                         {{ form.company_name.label }}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-floating mb-3">
+                                    <div class="form-floating">
                                         {{ form.industry(class="form-control", placeholder="Industry") }}
                                         {{ form.industry.label }}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-floating mb-3">
+                                    <div class="form-floating">
                                         {{ form.location(class="form-control", placeholder="Location") }}
                                         {{ form.location.label }}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-floating mb-3">
-                                        {{ form.company_size(class="form-control", type="number", min="1", placeholder="Company Size") }}
+                                    <div class="form-floating">
+                                        {{ form.company_size(class="form-select") }}
                                         {{ form.company_size.label }}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-floating mb-3">
-                                {{ form.founded_date(class="form-control", type="date") }}
-                                {{ form.founded_date.label }}
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        {{ form.founded_date(class="form-control") }}
+                                        {{ form.founded_date.label }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">Create Account</button>
+                        <div class="d-grid mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg py-3">
+                                <span class="submit-text">Create Account</span>
+                                <div class="spinner-border spinner-border-sm d-none" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </button>
                         </div>
                     </form>
 
-                    <div class="text-center mt-3">
-                        <p>Already have an account? <a href="{{ url_for('auth.login') }}" class="text-primary">Login here</a></p>
+                    <div class="text-center mt-4">
+                        <p class="text-muted">Already have an account? 
+                            <a href="{{ url_for('auth.login') }}" class="text-primary fw-bold">Sign In</a>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -190,112 +197,98 @@
 </div>
 
 <style>
-.form-floating > label {
-    padding: 1rem 0.75rem;
+.role-section {
+    border-left: 4px solid var(--bs-primary);
+    padding-left: 1.5rem;
+    margin: 1.5rem 0;
+    transition: all 0.3s ease;
 }
-.progress-bar {
-    transition: width 0.3s ease-in-out;
+
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    opacity: 0.8;
+    transform: scale(0.85) translateY(-0.8rem) translateX(0.15rem);
 }
-.card {
-    border: none;
-    border-radius: 15px;
-}
-.card-header {
-    border-radius: 15px 15px 0 0 !important;
-}
-.btn-primary {
-    padding: 0.8rem;
-    font-weight: 500;
-}
-.role-fields {
-    animation: fadeIn 0.3s ease-in-out;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+
+.invalid-feedback {
+    display: block;
+    margin-top: 0.25rem;
 }
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const userTypeSelect = document.getElementById('user_type');
-    const studentFields = document.getElementById('student-fields');
-    const instructorFields = document.getElementById('instructor-fields');
-    const companyFields = document.getElementById('company-fields');
-    const progressBar = document.getElementById('formProgress');
-    const form = document.querySelector('form');
-    const passwordInput = document.getElementById('password');
-    const strengthBar = document.querySelector('#passwordStrength .progress-bar');
-    const strengthText = document.getElementById('strengthText');
-
-    // Toggle role-specific fields
-    function toggleFields() {
-        const allFields = [studentFields, instructorFields, companyFields];
-        allFields.forEach(field => field.style.display = 'none');
-
-        switch(userTypeSelect.value) {
-            case 'student':
-                studentFields.style.display = 'block';
-                break;
-            case 'instructor':
-                instructorFields.style.display = 'block';
-                break;
-            case 'company':
-                companyFields.style.display = 'block';
-                break;
+    document.addEventListener('DOMContentLoaded', () => {
+        // DOM elements
+        const userType = document.getElementById('userType');
+        const roleSections = {
+            'student': document.getElementById('studentFields'),
+            'instructor': document.getElementById('instructorFields'),
+            'company': document.getElementById('companyFields')
+        };
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.querySelector('.progress-bar');
+        const strengthText = document.getElementById('strengthText');
+        const form = document.querySelector('form');
+    
+        // Toggle role-specific sections
+        function updateRoleSections() {
+            Object.values(roleSections).forEach(section => section.style.display = 'none');
+            const selectedRole = userType.value.toLowerCase();
+            if (roleSections[selectedRole]) {
+                roleSections[selectedRole].style.display = 'block';
+            }
+            updateProgress();
         }
+    
+        // Password strength calculator
+        function calculateStrength(password) {
+            let strength = 0;
+            if (password.length >= 8) strength += 25;
+            if (password.match(/[A-Z]/)) strength += 25;
+            if (password.match(/[0-9]/)) strength += 25;
+            if (password.match(/[^A-Za-z0-9]/)) strength += 25;
+            return Math.min(strength, 100);
+        }
+    
+        // Update progress bar
+        function updateProgress() {
+            const visibleFields = Array.from(document.querySelectorAll('.role-section:not([style*="none"]) .form-control'));
+            const filledFields = visibleFields.filter(field => field.value.trim() !== '');
+            const progress = (filledFields.length / visibleFields.length) * 100;
+            document.getElementById('formProgress').style.width = ${progress}%;
+        }
+    
+        // Event listeners
+        userType.addEventListener('change', updateRoleSections);
+        
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('input', updateProgress);
+        });
+    
+        passwordInput.addEventListener('input', function(e) {
+            const strength = calculateStrength(e.target.value);
+            strengthBar.style.width = ${strength}%;
+            strengthBar.className = `progress-bar ${
+                strength < 25 ? 'bg-danger' : 
+                strength < 50 ? 'bg-warning' : 
+                strength < 75 ? 'bg-info' : 'bg-success'
+            }`;
+            strengthText.textContent = 
+                strength < 25 ? 'Weak' : 
+                strength < 50 ? 'Fair' : 
+                strength < 75 ? 'Good' : 'Strong';
+        });
+    
+        form.addEventListener('submit', (e) => {
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.querySelector('.submit-text').textContent = 'Creating Account...';
+            btn.querySelector('.spinner-border').classList.remove('d-none');
+        });
+    
+        // Initial setup
+        updateRoleSections();
         updateProgress();
-    }
-
-    // Update form progress
-    function updateProgress() {
-        const inputs = form.querySelectorAll('input:not([type="hidden"])');
-        const filledInputs = Array.from(inputs).filter(input => input.value.trim() !== '');
-        const progress = (filledInputs.length / inputs.length) * 100;
-        progressBar.style.width = `${progress}%`;
-    }
-
-    // Check password strength
-    function checkPasswordStrength(password) {
-        let strength = 0;
-        if (password.length >= 8) strength += 25;
-        if (password.match(/[a-z]+/)) strength += 25;
-        if (password.match(/[A-Z]+/)) strength += 25;
-        if (password.match(/[0-9]+/)) strength += 25;
-
-        strengthBar.style.width = `${strength}%`;
-        if (strength < 25) {
-            strengthBar.className = 'progress-bar bg-danger';
-            strengthText.textContent = 'Weak';
-        } else if (strength < 50) {
-            strengthBar.className = 'progress-bar bg-warning';
-            strengthText.textContent = 'Fair';
-        } else if (strength < 75) {
-            strengthBar.className = 'progress-bar bg-info';
-            strengthText.textContent = 'Good';
-        } else {
-            strengthBar.className = 'progress-bar bg-success';
-            strengthText.textContent = 'Strong';
-        }
-    }
-
-    // Event listeners
-    userTypeSelect.addEventListener('change', toggleFields);
-    form.addEventListener('input', updateProgress);
-    passwordInput.addEventListener('input', (e) => checkPasswordStrength(e.target.value));
-
-    // Form validation
-    form.addEventListener('submit', function(event) {
-        if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        form.classList.add('was-validated');
     });
-
-    // Initialize
-    toggleFields();
-    updateProgress();
-});
-</script>
+    </script>
+    
 {% endblock %}

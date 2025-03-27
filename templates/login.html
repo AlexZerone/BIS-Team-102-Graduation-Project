@@ -2,204 +2,105 @@
 
 {% block title %}Login - Education System{% endblock %}
 
-{% block extra_css %}
-<style>
-    .login-container {
-        max-width: 450px;
-        margin: 4rem auto;
-        padding: 2rem;
-        background-color: #ffffff;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .login-header {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .login-header h2 {
-        color: #333;
-        font-weight: 600;
-    }
-
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-
-    .form-control {
-        padding: 0.75rem;
-        border: 1px solid #ced4da;
-        border-radius: 5px;
-        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    }
-
-    .form-control:focus {
-        border-color: #80bdff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
-
-    .login-btn {
-        width: 100%;
-        padding: 0.75rem;
-        font-size: 1.1rem;
-        margin: 1rem 0;
-    }
-
-    .signup-link {
-        text-align: center;
-        margin-top: 1rem;
-    }
-
-    .form-label {
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-    }
-
-    .alert {
-        margin-bottom: 1.5rem;
-    }
-
-    .password-group {
-        position: relative;
-    }
-
-    .password-toggle {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: #6c757d;
-    }
-
-    .social-login {
-        text-align: center;
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #dee2e6;
-    }
-
-    .social-login-buttons {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        margin-top: 1rem;
-    }
-
-    .social-btn {
-        padding: 0.5rem 1.5rem;
-        border-radius: 5px;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="container">
     <div class="login-container">
         <div class="login-header">
-            <h2>Welcome Back</h2>
-            <p class="text-muted">Please login to your account</p>
+            <h2 class="mb-3">Welcome Back</h2>
+            <p class="text-muted">Please login to continue</p>
         </div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {% include '_flash_messages.html' %}
+
+        <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+            {{ form.csrf_token() }}
+
+            <!-- Email Input -->
+            <div class="mb-4">
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors), placeholder="name@example.com") }}
+                {% if form.email.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.email.errors[0] }}
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm">
-            {{ form.csrf_token }}
-
-            <div class="form-group">
-                <label for="userEmail" class="form-label">Email Address</label>
-                <input 
-                    class="form-control" 
-                    type="email" 
-                    name="email" 
-                    id="userEmail" 
-                    placeholder="Enter your email"
-                    required
-                >
+                {% endif %}
             </div>
 
-            <div class="form-group">
-                <label for="userPass" class="form-label">Password</label>
-                <div class="password-group">
-                    <input 
-                        class="form-control" 
-                        type="password" 
-                        name="password" 
-                        id="userPass" 
-                        placeholder="Enter your password"
-                        required
-                    >
-                    <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
+            <!-- Password Input -->
+            <div class="mb-4">
+                {{ form.password.label(class="form-label") }}
+                <div class="input-group">
+                    {{ form.password(class="form-control" + (" is-invalid" if form.password.errors), placeholder="Enter your password") }}
+                    <button type="button" class="btn btn-outline-secondary" id="passwordToggle" aria-label="Show password">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
-                <div class="d-flex justify-content-end mt-2">
-                    <a href="#" class="text-decoration-none small">Forgot Password?</a>
+                {% if form.password.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.password.errors[0] }}
+                    </div>
+                {% endif %}
+                <div class="text-end mt-2">
+                    <a href="{{ url_for('auth.reset_request') }}" class="small text-decoration-none">Forgot Password?</a>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary login-btn">
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
                 <i class="fas fa-sign-in-alt me-2"></i>Login
             </button>
 
-            <div class="signup-link">
-                Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-decoration-none">Sign Up</a>
-            </div>
-
-            <div class="social-login">
-                <p class="text-muted">Or login with</p>
-                <div class="social-login-buttons">
-                    <button type="button" class="btn btn-outline-danger social-btn">
-                        <i class="fab fa-google"></i>
-                        Google
-                    </button>
-                    <button type="button" class="btn btn-outline-primary social-btn">
-                        <i class="fab fa-facebook-f"></i>
-                        Facebook
-                    </button>
-                </div>
+            <!-- Registration Link -->
+            <div class="text-center">
+                <span class="text-muted">Don't have an account?</span>
+                <a href="{{ url_for('auth.register') }}" class="text-decoration-none">Create Account</a>
             </div>
         </form>
     </div>
 </div>
 {% endblock %}
 
+{% block extra_css %}
+<style>
+.login-container {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+#passwordToggle {
+    border-left: 0;
+    border-color: #ced4da;
+}
+</style>
+{% endblock %}
+
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     // Password visibility toggle
-    const passwordToggle = document.getElementById('passwordToggle');
-    const passwordInput = document.getElementById('userPass');
-
-    passwordToggle.addEventListener('click', function() {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        this.classList.toggle('fa-eye');
-        this.classList.toggle('fa-eye-slash');
+    const togglePassword = document.querySelector('#passwordToggle');
+    const passwordField = document.querySelector('#{{ form.password.id }}');
+    
+    togglePassword.addEventListener('click', function(e) {
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('fa-eye');
+        this.querySelector('i').classList.toggle('fa-eye-slash');
     });
 
     // Form validation
-    const loginForm = document.getElementById('loginForm');
-    loginForm.addEventListener('submit', function(event) {
-        const email = document.getElementById('userEmail').value;
-        const password = passwordInput.value;
-
-        if (!email || !password) {
-            event.preventDefault();
-            alert('Please fill in all fields');
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
         }
-    });
+        form.classList.add('was-validated');
+    }, false);
 });
 </script>
 {% endblock %}

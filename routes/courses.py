@@ -11,23 +11,21 @@ courses_bp = Blueprint('courses', __name__)
 @courses_bp.route('/courses')
 @login_required
 def courses():
-    if 'user_id' not in session:
-        flash('Please log in to view courses', 'warning')
-        return redirect(url_for('auth.login'))
-    
     user_id = session['user_id']
     user_type = session['user_type']
     
     if user_type == 'student':
-        registered_courses = get_records('''
+        # Get all courses with enrollment status
+        courses = get_records('''
             SELECT c.*, cr.Status as RegistrationStatus 
             FROM courses c
-            JOIN course_registrations cr ON c.CourseID = cr.CourseID
-            WHERE cr.StudentID = (SELECT StudentID FROM students WHERE UserID = %s)
+            LEFT JOIN course_registrations cr 
+                ON c.CourseID = cr.CourseID 
+                AND cr.StudentID = (SELECT StudentID FROM students WHERE UserID = %s)
         ''', (user_id,))
-
     elif user_type == 'instructor':
-        registered_courses = get_records('''
+        # Existing instructor logic remains
+        courses = get_records('''
             SELECT c.*, COUNT(cr.StudentID) as EnrolledStudents
             FROM courses c
             JOIN instructor_courses ic ON c.CourseID = ic.CourseID
@@ -36,8 +34,7 @@ def courses():
             GROUP BY c.CourseID
         ''', (user_id,))
     
-    return render_template('courses.html', courses=registered_courses, user_type=user_type)
-
+    return render_template('courses.html', courses=courses, user_type=user_type)
 
 
 @courses_bp.route('/course/<int:course_id>')
@@ -92,20 +89,19 @@ def course_detail(course_id):
 @login_required
 @role_required(['student'])
 def enrolled_courses():
-    if 'user_id' not in session:
-        flash('Please log in to view courses', 'warning')
-        return redirect(url_for('auth.login'))
-
     user_id = session['user_id']
-    user_type = session['user_type']
-    
-    if user_type == 'student':
-        registered_courses = get_records('''
-            SELECT c.*, cr.Status as RegistrationStatus 
-            FROM courses c
-            JOIN course_registrations cr ON c.CourseID = cr.CourseID
-            WHERE cr.StudentID = (SELECT StudentID FROM students WHERE UserID = %s)
-        ''', (user_id,))
-    
-    return render_template('courses.html', courses=registered_courses, user_type=user_type)
+    registered_courses = get_records('''
+        SELECT c.*, cr.Status as RegistrationStatus 
+        FROM courses c
+        JOIN course_registrations cr ON c.CourseID = cr.CourseID
+        WHERE cr.StudentID = (SELECT StudentID FROM students WHERE UserID = %s)
+    ''', (user_id,))
+    return render_template('enrolled_courses.html', courses=registered_courses)
 
+'''
+@courses_bp.route('/course/manage_courses')
+@login_required
+@role_required(['instructor'])
+def manage_courses():
+'''
+    
