@@ -109,6 +109,50 @@ def enrolled_courses():
     
     return render_template('courses.html', courses=registered_courses, user_type=user_type)
 
+
+@courses_bp.route('/course/create', methods=['GET', 'POST'])
+@login_required
+@role_required(['instructor'])
+def create_course():
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        duration = request.form.get('duration')
+
+        if not title or not start_date or not end_date:
+            flash('Please fill in all required fields.', 'danger')
+            return render_template('create_course.html')
+
+        try:
+            # Step 1: Insert into courses table
+            course_id = execute_query('''
+                INSERT INTO courses (Title, Description, StartDate, EndDate, Duration)
+                VALUES (%s, %s, %s, %s, %s)
+                RETURNING CourseID
+            ''', (title, description, start_date, end_date, duration), fetch_one=True)['CourseID']
+
+            # Step 2: Link course to the instructor
+            execute_query('''
+                INSERT INTO instructor_courses (InstructorID, CourseID)
+                VALUES (
+                    (SELECT InstructorID FROM instructors WHERE UserID = %s),
+                    %s
+                )
+            ''', (session['user_id'], course_id))
+
+            flash('Course created successfully!', 'success')
+            return redirect(url_for('courses.courses'))
+
+        except Exception as e:
+            flash(f'Error creating course: {str(e)}', 'danger')
+
+    return render_template('create_course.html')
+
 @courses_bp.route('/course/manage_courses')
 @login_required
 @role_required(['instructor'])

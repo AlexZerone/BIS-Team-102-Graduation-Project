@@ -151,3 +151,117 @@ def manage_assignments():
     except Exception as e:
         flash(f"Error loading instructor assignments: {str(e)}", "danger")
         return render_template('manage_assignments.html', assignments=[])
+
+
+@assignments_bp.route('/submit-assessment/<int:assess_id>', methods=['POST'])
+@login_required
+@role_required(['student'])
+def submit_assessment(assess_id):
+    if 'user_id' not in session:
+        flash('Please log in to submit the assignment', 'warning')
+        return redirect(url_for('auth.login'))
+
+    try:
+        # Get current student ID
+        student = get_record('SELECT StudentID FROM students WHERE UserID = %s', (session['user_id'],))
+        if not student:
+            flash("Student profile not found", "danger")
+            return redirect(url_for("assignments.assignments"))
+        
+        student_id = student['StudentID']
+
+        # Get submission content from form
+        content = request.form.get('content', '').strip()
+        if not content:
+            flash('Submission content is required', 'danger')
+            return redirect(url_for('assignments.assessment_detail', assess_id=assess_id))
+
+        # Check if already submitted
+        existing = get_record('''
+            SELECT * FROM student_assessments
+            WHERE StudentID = %s AND AssessID = %s
+        ''', (student_id, assess_id))
+
+        if existing:
+            # Update existing submission
+            execute_query('''
+                UPDATE student_assessments
+                SET Content = %s, SubmissionDate = NOW(), Status = 'Submitted'
+                WHERE StudentID = %s AND AssessID = %s
+            ''', (content, student_id, assess_id))
+            flash('Assignment updated successfully', 'success')
+        else:
+            # Insert new submission
+            execute_query('''
+                INSERT INTO student_assessments
+                (StudentID, AssessID, SubmissionDate, Status, Content)
+                VALUES (%s, %s, NOW(), 'Submitted', %s)
+            ''', (student_id, assess_id, content))
+            flash('Assignment submitted successfully', 'success')
+
+        return redirect(url_for('assignments.assessment_detail', assess_id=assess_id))
+
+    except Exception as e:
+        flash(f'Error submitting assignment: {str(e)}', 'danger')
+        return redirect(url_for('assignments.assessment_detail', assess_id=assess_id))
+
+@assignments_bp.route('/create-assessment', methods=['GET', 'POST'])
+@login_required
+@role_required(['instructor'])
+def create_assessment():
+    if 'user_id' not in session:
+        flash('Please log in to create an assessment', 'warning')
+        return redirect(url_for('auth.login'))
+
+    try:
+        # Get instructor's ID
+        instructor = get_record('SELECT InstructorID FROM instructors WHERE UserID = %s', (session['user_id'],))
+        if not instructor:
+            flash("Instructor profile not found", "danger")
+            return redirect(url_for("dashboard.dashboard"))
+
+        instructor_id = instructor['InstructorID']
+
+        # Fetch courses assigned to the instructor
+        courses = get_records('''
+            SELECT c.CourseID, c.Title 
+            FROM courses c
+            JOIN instructor_courses ic ON c.CourseID = ic.CourseID
+            WHERE ic.InstructorID = %s
+        ''', (instructor_id,))
+
+        if request.method == 'POST':
+            title = request.form.get('title', '').strip()
+            description = request.form.get('description', '').strip()
+            due_date = request.form.get('due_date')
+            course_id = request.form.get('course_id')
+
+            if not (title and description and due_date and course_id):
+                flash('All fields are required', 'danger')
+                return redirect(url_for('assignments.create_assessment'))
+
+            # Insert the assessment
+            execute_query('''
+                INSERT INTO assessments (Title, Description, DueDate, CourseID)
+                VALUES (%s, %s, %s, %s)
+            ''', (title, description, due_date, course_id))
+
+            flash('Assessment created successfully', 'success')
+            return redirect(url_for('assignments.assignments'))
+
+        return render_template('create_assessment.html', courses=courses)
+
+    except Exception as e:
+        flash(f'Error creating assessment: {str(e)}', 'danger')
+        return redirect(url_for('assignments.assignments'))
+
+
+
+
+
+
+
+
+
+
+

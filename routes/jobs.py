@@ -133,3 +133,96 @@ def apply_job(job_id):
     except Exception as e:
         flash(f'Error submitting application: {str(e)}', 'danger')
         return redirect(url_for('jobs.jobs'))
+
+
+
+@jobs_bp.route('/manage-jobs', methods=['GET', 'POST'])
+@login_required
+@role_required(['company'])
+def manage_jobs():
+    user_id = session['user_id']
+
+    try:
+        # Get company ID from the session's user
+        company = get_record('SELECT CompanyID FROM companies WHERE UserID = %s', (user_id,))
+        if not company:
+            flash("Company profile not found!", "danger")
+            return redirect(url_for("dashboard.dashboard"))
+        company_id = company['CompanyID']
+
+        if request.method == 'POST':
+            # Form data for adding/updating
+            job_id = request.form.get('job_id')  # present only during editing
+            title = request.form['title']
+            description = request.form['description']
+            location = request.form['location']
+            salary = request.form['salary']
+            deadline = request.form['deadline']
+
+            if job_id:  # Edit existing job
+                execute_query('''
+                    UPDATE jobs 
+                    SET Title=%s, Description=%s, Location=%s, Salary=%s, DeadlineDate=%s 
+                    WHERE JobID=%s AND CompanyID=%s
+                ''', (title, description, location, salary, deadline, job_id, company_id))
+                flash("Job updated successfully.", "success")
+            else:  # Add new job
+                execute_query('''
+                    INSERT INTO jobs (CompanyID, Title, Description, Location, Salary, PostingDate, DeadlineDate)
+                    VALUES (%s, %s, %s, %s, %s, NOW(), %s)
+                ''', (company_id, title, description, location, salary, deadline))
+                flash("New job posted successfully.", "success")
+
+            return redirect(url_for('jobs.manage_jobs'))
+
+        # GET request: fetch all jobs posted by this company
+        jobs = get_records('''
+            SELECT * FROM jobs 
+            WHERE CompanyID = %s
+            ORDER BY PostingDate DESC
+        ''', (company_id,))
+        return render_template('manage_jobs.html', jobs=jobs)
+
+    except Exception as e:
+        flash(f"Error managing jobs: {str(e)}", "danger")
+        return render_template('manage_jobs.html', jobs=[])
+
+
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+
+    company_user_id = session['user_id']
+
+    try:
+        # Validate ownership of the job by the logged-in company
+        job = get_record('''
+            SELECT j.*
+            FROM jobs j
+            JOIN companies c ON j.CompanyID = c.CompanyID
+            WHERE j.JobID = %s AND c.UserID = %s
+        ''', (job_id, company_user_id))
+
+        if not job:
+            flash('Job not found or unauthorized access', 'danger')
+            return redirect(url_for('jobs.jobs'))
+
+        if request.method == 'POST':
+            title = request.form.get('title')
+            description = request.form.get('description')
+            requirements = request.form.get('requirements')
+            deadline_date = request.form.get('deadline_date')
+
+            execute_query('''
+                UPDATE jobs
+                SET Title = %s, Description = %s, Requirements = %s, DeadlineDate = %s
+                WHERE JobID = %s
+            ''', (title, description, requirements, deadline_date, job_id))
+
+            flash('Job updated successfully', 'success')
+            return redirect(url_for('jobs.job_detail', job_id=job_id))
+
+        return render_template('edit_job.html', job=job)
+
+    except Exception as e:
+        flash(f'Error updating job: {str(e)}', 'danger')
+        return redirect(url_for('jobs.jobs'))
