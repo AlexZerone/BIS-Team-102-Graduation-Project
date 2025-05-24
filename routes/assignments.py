@@ -119,4 +119,35 @@ def assessment_detail(assess_id):
         flash(f'Error loading assessment details: {str(e)}', 'danger')
         return redirect(url_for('assignments.assignments'))
 
+@assignments_bp.route('/assignment/manage_assignments')
+@login_required
+@role_required(['instructor'])
+def manage_assignments():
+    user_id = session['user_id']
+    
+    try:
+        # Get instructor's ID
+        instructor = get_record('SELECT InstructorID FROM instructors WHERE UserID = %s', (user_id,))
+        if not instructor:
+            flash("Instructor profile not found!", "danger")
+            return redirect(url_for("dashboard.dashboard"))
+        
+        instructor_id = instructor['InstructorID']
 
+        # Get assessments created by instructor with course info and submission count
+        assignments = get_records('''
+            SELECT a.AssessID, a.Title AS AssignmentTitle, a.DueDate, 
+                   c.Title AS CourseTitle,
+                   (SELECT COUNT(*) FROM student_assessments sa WHERE sa.AssessID = a.AssessID) AS SubmissionCount
+            FROM assessments a
+            JOIN courses c ON a.CourseID = c.CourseID
+            JOIN instructor_courses ic ON c.CourseID = ic.CourseID
+            WHERE ic.InstructorID = %s
+            ORDER BY a.DueDate ASC
+        ''', (instructor_id,))
+        
+        return render_template('manage_assignments.html', assignments=assignments)
+
+    except Exception as e:
+        flash(f"Error loading instructor assignments: {str(e)}", "danger")
+        return render_template('manage_assignments.html', assignments=[])

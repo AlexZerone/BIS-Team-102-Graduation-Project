@@ -109,3 +109,24 @@ def enrolled_courses():
     
     return render_template('courses.html', courses=registered_courses, user_type=user_type)
 
+@courses_bp.route('/course/manage_courses')
+@login_required
+@role_required(['instructor'])
+def manage_courses():
+    user_id = session['user_id']
+    
+    # Get instructor's courses with enrollment count
+    courses = get_records('''
+        SELECT c.*, 
+               COUNT(DISTINCT cr.StudentID) AS EnrolledCount
+        FROM courses c
+        JOIN instructor_courses ic ON c.CourseID = ic.CourseID
+        LEFT JOIN course_registrations cr ON c.CourseID = cr.CourseID
+        WHERE ic.InstructorID = (
+            SELECT InstructorID FROM instructors WHERE UserID = %s
+        )
+        GROUP BY c.CourseID
+        ORDER BY c.Title
+    ''', (user_id,))
+    
+    return render_template('manage_courses.html', courses=courses)
