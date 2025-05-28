@@ -84,7 +84,7 @@
                     <h5 class="mb-0">Edit Profile</h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('profile') }}">
+                    <form method="POST" action="{{ url_for('profile.profile') }}">
                         {{ form.csrf_token }}
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -155,7 +155,7 @@
                         <h5 class="mb-0">Resume</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ url_for('upload_resume') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ url_for('profile.upload_resume') }}" method="POST" enctype="multipart/form-data">
                             {{ form.csrf_token }}
                             <div class="mb-3">
                                 <label for="resume" class="form-label">Upload Resume</label>
@@ -175,7 +175,7 @@
 <div class="modal fade" id="changePasswordModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ url_for('change_password') }}" method="POST">
+            <form action="{{ url_for('profile.change_password') }}" method="POST">
                 {{ form.csrf_token }}
                 <div class="modal-header">
                     <h5 class="modal-title">Change Password</h5>
@@ -217,7 +217,7 @@
             </div>
             <div class="modal-body">
                 <p>Are you sure you want to delete your account? This action cannot be undone.</p>
-                <form action="{{ url_for('delete_account') }}" method="POST">
+                <form action="{{ url_for('profile.delete_account') }}" method="POST">
                     {{ form.csrf_token }}
                     <div class="mb-3">
                         <label for="confirm_delete" class="form-label">Type "DELETE" to confirm</label>

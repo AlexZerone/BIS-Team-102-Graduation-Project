@@ -1,0 +1,33 @@
+<ul class="navbar-nav me-auto">
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}" 
+           href="{{ url_for('dashboard.dashboard') }}">
+           <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'courses.enrolled_courses' %}active{% endif %}" 
+           href="{{ url_for('courses.enrolled_courses') }}">
+           <i class="fas fa-book"></i> My Courses
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'assignments.assignments' %}active{% endif %}" 
+           href="{{ url_for('assignments.assignments') }}">
+           <i class="fas fa-tasks"></i> Assignments
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'jobs.jobs' %}active{% endif %}" 
+           href="{{ url_for('jobs.jobs') }}">
+           <i class="fas fa-briefcase"></i> Jobs
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'enrollments.enrollment' %}active{% endif %}" 
+           href="{{ url_for('enrollments.enrollment') }}">
+           <i class="fas fa-sign-in-alt"></i> Enroll
+        </a>
+    </li>
+</ul>
+

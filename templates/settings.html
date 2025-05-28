@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Sec Era{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Account Settings</h2>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4>Change Password</h4>
+            <form method="POST" action="{{ url_for('profile.settings') }}" id="passwordForm">
+                <div class="mb-3">
+                    <label for="new_password" class="form-label">New Password</label>
+                    <input type="password" class="form-control" id="new_password" name="new_password" required minlength="6">
+                </div>
+                <div class="mb-3">
+                    <label for="confirm_password" class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary">Update Password</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Future Settings Section -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <h4>Preferences (Coming Soon)</h4>
+            <p>Notification settings, theme customization, and more will be available soon.</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById("passwordForm").addEventListener("submit", function(event) {
+        let newPassword = document.getElementById("new_password").value;
+        let confirmPassword = document.getElementById("confirm_password").value;
+
+        if (newPassword !== confirmPassword) {
+            event.preventDefault();
+            alert("Passwords do not match!");
+        }
+    });
+</script>
+{% endblock %}

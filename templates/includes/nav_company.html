@@ -1,0 +1,16 @@
+<ul class="navbar-nav me-auto">
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}" 
+           href="{{ url_for('dashboard.dashboard') }}">
+           <i class="fas fa-building"></i> Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'jobs.manage_jobs' %}active{% endif %}" 
+           href="{{ url_for('jobs.manage_jobs') }}">
+           <i class="fas fa-briefcase"></i> Manage Jobs
+        </a>
+    </li>
+
+</ul>
+

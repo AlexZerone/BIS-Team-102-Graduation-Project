@@ -29,10 +29,10 @@
                         <div class="card-body">
                             <h5 class="card-title">Quick Links</h5>
                             <div class="list-group">
-                                <a href="{{ url_for('courses') }}" class="list-group-item list-group-item-action">Courses</a>
-                                <a href="{{ url_for('assignments') }}" class="list-group-item list-group-item-action">Assignments</a>
+                                <a href="{{ url_for('courses.courses') }}" class="list-group-item list-group-item-action">Courses</a>
+                                <a href="{{ url_for('assignments.assignments') }}" class="list-group-item list-group-item-action">Assignments</a>
                                 {% if user_type == 'student' %}
-                                    <a href="{{ url_for('jobs') }}" class="list-group-item list-group-item-action">Job Listings</a>
+                                    <a href="{{ url_for('jobs.jobs') }}" class="list-group-item list-group-item-action">Job Listings</a>
                                 {% endif %}
                             </div>
                         </div>

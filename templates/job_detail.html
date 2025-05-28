@@ -112,7 +112,7 @@
 <div class="modal fade" id="applyModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ url_for('apply_job', job_id=job.JobID) }}" method="POST">
+            <form action="{{ url_for('jobs.apply_job', job_id=job.JobID) }}" method="POST">
                 {{ form.csrf_token }}
                 <div class="modal-header">
                     <h5 class="modal-title">Apply for {{ job.Title }}</h5>
