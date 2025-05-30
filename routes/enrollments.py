@@ -2,11 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, session, B
 from models import get_record, get_records, execute_query
 from permissions import login_required, role_required
 
-
-
 enrollments_bp = Blueprint('enrollments', __name__)
-
-
 
 # ✅ **Optimized Enrollment Route**
 @enrollments_bp.route('/enrollment', methods=['GET', 'POST'])
@@ -64,4 +60,3 @@ def enrollment():
     except Exception as e:
         flash(f'Error processing enrollment: {str(e)}', 'danger')
         return render_template('enrollment.html', available_courses=[], user_type=user_type)
-

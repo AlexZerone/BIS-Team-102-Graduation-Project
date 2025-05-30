@@ -12,11 +12,11 @@
                             <h5 class="card-title">Profile Information</h5>
                             <p class="card-text">
                                 <strong>Email:</strong> {{ user.Email }}<br>
-                                <strong>User Type:</strong> {{ user_type }}<br>
+                                <strong>User Type:</strong> {{ user_type|capitalize }}<br>
                                 {% if profile %}
                                     {% for key, value in profile.items() %}
                                         {% if key != 'UserID' %}
-                                            <strong>{{ key }}:</strong> {{ value }}<br>
+                                            <strong>{{ key.replace('_', ' ')|capitalize }}:</strong> {{ value }}<br>
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}

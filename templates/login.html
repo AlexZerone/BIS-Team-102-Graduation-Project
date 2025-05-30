@@ -121,29 +121,21 @@
 
             <div class="form-group">
                 <label for="userEmail" class="form-label">Email Address</label>
-                <input 
-                    class="form-control" 
-                    type="email" 
-                    name="email" 
-                    id="userEmail" 
-                    placeholder="Enter your email"
-                    required
-                >
+                {{ form.email(class="form-control", id="userEmail", placeholder="Enter your email", required=True) }}
+                {% for error in form.email.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="form-group">
                 <label for="userPass" class="form-label">Password</label>
                 <div class="password-group">
-                    <input 
-                        class="form-control" 
-                        type="password" 
-                        name="password" 
-                        id="userPass" 
-                        placeholder="Enter your password"
-                        required
-                    >
+                    {{ form.password(class="form-control", id="userPass", placeholder="Enter your password", required=True) }}
                     <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
                 </div>
+                {% for error in form.password.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
                 <div class="d-flex justify-content-end mt-2">
                     <a href="#" class="text-decoration-none small">Forgot Password?</a>
                 </div>
@@ -160,11 +152,11 @@
             <div class="social-login">
                 <p class="text-muted">Or login with</p>
                 <div class="social-login-buttons">
-                    <button type="button" class="btn btn-outline-danger social-btn">
+                    <button type="button" class="btn btn-outline-danger social-btn" disabled>
                         <i class="fab fa-google"></i>
                         Google
                     </button>
-                    <button type="button" class="btn btn-outline-primary social-btn">
+                    <button type="button" class="btn btn-outline-primary social-btn" disabled>
                         <i class="fab fa-facebook-f"></i>
                         Facebook
                     </button>

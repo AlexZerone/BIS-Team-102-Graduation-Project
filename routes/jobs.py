@@ -3,12 +3,7 @@ from models import get_record, get_records, execute_query
 from permissions import login_required, role_required
 from extensions import mysql
 
-
-
 jobs_bp = Blueprint('jobs', __name__)
-
-
-
 
 # ✅ **Optimized Jobs Route**
 @jobs_bp.route('/jobs')
@@ -58,8 +53,6 @@ def jobs():
     except Exception as e:
         flash(f'Error loading jobs: {str(e)}', 'danger')
         return render_template('jobs.html', jobs=[], user_type=user_type)
-
-
 
 @jobs_bp.route('/job/<int:job_id>')
 @login_required
@@ -134,8 +127,6 @@ def apply_job(job_id):
         flash(f'Error submitting application: {str(e)}', 'danger')
         return redirect(url_for('jobs.jobs'))
 
-
-
 @jobs_bp.route('/manage-jobs', methods=['GET', 'POST'])
 @login_required
 @role_required(['company'])
@@ -188,41 +179,41 @@ def manage_jobs():
         return render_template('manage_jobs.html', jobs=[])
 
 
-    if 'user_id' not in session:
+@jobs_bp.route('/edit-job/<int:job_id>', methods=['GET', 'POST'])
+@login_required
+@role_required(['company'])
+def edit_job(job_id):
+    # Ensure company owns this job
+    user_id = session.get('user_id')
+    if not user_id:
         return redirect(url_for('auth.login'))
 
-    company_user_id = session['user_id']
+    company = get_record('SELECT CompanyID FROM companies WHERE UserID = %s', (user_id,))
+    if not company:
+        flash("Company profile not found!", "danger")
+        return redirect(url_for("dashboard.dashboard"))
+    company_id = company['CompanyID']
 
-    try:
-        # Validate ownership of the job by the logged-in company
-        job = get_record('''
-            SELECT j.*
-            FROM jobs j
-            JOIN companies c ON j.CompanyID = c.CompanyID
-            WHERE j.JobID = %s AND c.UserID = %s
-        ''', (job_id, company_user_id))
+    job = get_record('''
+        SELECT * FROM jobs
+        WHERE JobID = %s AND CompanyID = %s
+    ''', (job_id, company_id))
+    if not job:
+        flash('Job not found or unauthorized access', 'danger')
+        return redirect(url_for('jobs.manage_jobs'))
 
-        if not job:
-            flash('Job not found or unauthorized access', 'danger')
-            return redirect(url_for('jobs.jobs'))
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+        location = request.form.get('location')
+        salary = request.form.get('salary')
+        deadline = request.form.get('deadline')
+        execute_query('''
+            UPDATE jobs
+            SET Title = %s, Description = %s, Location = %s, Salary = %s, DeadlineDate = %s
+            WHERE JobID = %s AND CompanyID = %s
+        ''', (title, description, location, salary, deadline, job_id, company_id))
+        flash('Job updated successfully', 'success')
+        return redirect(url_for('jobs.manage_jobs'))
 
-        if request.method == 'POST':
-            title = request.form.get('title')
-            description = request.form.get('description')
-            requirements = request.form.get('requirements')
-            deadline_date = request.form.get('deadline_date')
-
-            execute_query('''
-                UPDATE jobs
-                SET Title = %s, Description = %s, Requirements = %s, DeadlineDate = %s
-                WHERE JobID = %s
-            ''', (title, description, requirements, deadline_date, job_id))
-
-            flash('Job updated successfully', 'success')
-            return redirect(url_for('jobs.job_detail', job_id=job_id))
-
-        return render_template('edit_job.html', job=job)
-
-    except Exception as e:
-        flash(f'Error updating job: {str(e)}', 'danger')
-        return redirect(url_for('jobs.jobs'))
+    return render_template('edit_job.html', job=job)

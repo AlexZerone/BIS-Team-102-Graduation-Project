@@ -97,7 +97,7 @@
                     <p><strong>Posted:</strong> {{ job.PostingDate.strftime('%Y-%m-%d') }}</p>
                     <p><strong>Deadline:</strong> {{ job.DeadlineDate.strftime('%Y-%m-%d') }}</p>
                     
-                    {% if session.user_type == 'company' %}
+                    {% if session.user_type == 'company' and job.ApplicationCount is defined %}
                         <hr>
                         <h6>Applications Received: {{ job.ApplicationCount }}</h6>
                     {% endif %}
@@ -113,7 +113,9 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ url_for('jobs.apply_job', job_id=job.JobID) }}" method="POST">
-                {{ form.csrf_token }}
+                {% if form and form.csrf_token %}
+                    {{ form.csrf_token }}
+                {% endif %}
                 <div class="modal-header">
                     <h5 class="modal-title">Apply for {{ job.Title }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

@@ -21,7 +21,7 @@
                         {% endif %}
                     {% endwith %}
 
-                    <form method="POST" class="needs-validation" novalidate>
+                    <form method="POST" class="needs-validation" novalidate autocomplete="off">
                         {{ form.csrf_token }}
 
                         <!-- Progress Indicator -->
@@ -33,38 +33,50 @@
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3">
-                                    {{ form.first_name(class="form-control", placeholder="First Name", required=true) }}
-                                    {{ form.first_name.label }}
+                                    {{ form.first_name(class="form-control", id="first_name", placeholder="First Name", required=true, autocomplete="off") }}
+                                    <label for="first_name">{{ form.first_name.label.text }}</label>
                                     <div class="invalid-feedback">
                                         Please enter your first name.
                                     </div>
+                                    {% for error in form.first_name.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating mb-3">
-                                    {{ form.last_name(class="form-control", placeholder="Last Name", required=true) }}
-                                    {{ form.last_name.label }}
+                                    {{ form.last_name(class="form-control", id="last_name", placeholder="Last Name", required=true, autocomplete="off") }}
+                                    <label for="last_name">{{ form.last_name.label.text }}</label>
                                     <div class="invalid-feedback">
                                         Please enter your last name.
                                     </div>
+                                    {% for error in form.last_name.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-floating mb-3">
-                            {{ form.email(class="form-control", placeholder="Email", required=true) }}
-                            {{ form.email.label }}
+                            {{ form.email(class="form-control", id="email", placeholder="Email", required=true, autocomplete="off") }}
+                            <label for="email">{{ form.email.label.text }}</label>
                             <div class="invalid-feedback">
                                 Please enter a valid email address.
                             </div>
+                            {% for error in form.email.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
                         </div>
 
                         <div class="form-floating mb-3">
-                            {{ form.password(class="form-control", placeholder="Password", required=true) }}
-                            {{ form.password.label }}
+                            {{ form.password(class="form-control", id="password", placeholder="Password", required=true, autocomplete="off") }}
+                            <label for="password">{{ form.password.label.text }}</label>
                             <div class="invalid-feedback">
                                 Password must be at least 6 characters long.
                             </div>
+                            {% for error in form.password.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
                         </div>
 
                         <!-- Password Strength Indicator -->
@@ -78,8 +90,11 @@
                         </div>
 
                         <div class="form-floating mb-4">
-                            {{ form.user_type(class="form-control", required=true) }}
-                            {{ form.user_type.label }}
+                            {{ form.user_type(class="form-control", id="user_type", required=true) }}
+                            <label for="user_type">{{ form.user_type.label.text }}</label>
+                            {% for error in form.user_type.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
                         </div>
 
                         <!-- Student Fields -->
@@ -88,28 +103,40 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
-                                        {{ form.university(class="form-control", placeholder="University") }}
-                                        {{ form.university.label }}
+                                        {{ form.university(class="form-control", id="university", placeholder="University", autocomplete="off") }}
+                                        <label for="university">{{ form.university.label.text }}</label>
+                                        {% for error in form.university.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
-                                        {{ form.major(class="form-control", placeholder="Major") }}
-                                        {{ form.major.label }}
+                                        {{ form.major(class="form-control", id="major", placeholder="Major", autocomplete="off") }}
+                                        <label for="major">{{ form.major.label.text }}</label>
+                                        {% for error in form.major.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
-                                        {{ form.gpa(class="form-control", placeholder="GPA", type="number", step="0.01", min="0", max="4") }}
-                                        {{ form.gpa.label }}
+                                        {{ form.gpa(class="form-control", id="gpa", placeholder="GPA", type="number", step="0.01", min="0", max="4", autocomplete="off") }}
+                                        <label for="gpa">{{ form.gpa.label.text }}</label>
+                                        {% for error in form.gpa.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
-                                        {{ form.expected_graduation_date(class="form-control", type="date") }}
-                                        {{ form.expected_graduation_date.label }}
+                                        {{ form.expected_graduation_date(class="form-control", id="expected_graduation_date", type="date", autocomplete="off") }}
+                                        <label for="expected_graduation_date">{{ form.expected_graduation_date.label.text }}</label>
+                                        {% for error in form.expected_graduation_date.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>
@@ -121,20 +148,29 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
-                                        {{ form.department(class="form-control", placeholder="Department") }}
-                                        {{ form.department.label }}
+                                        {{ form.department(class="form-control", id="department", placeholder="Department", autocomplete="off") }}
+                                        <label for="department">{{ form.department.label.text }}</label>
+                                        {% for error in form.department.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
-                                        {{ form.specialization(class="form-control", placeholder="Specialization") }}
-                                        {{ form.specialization.label }}
+                                        {{ form.specialization(class="form-control", id="specialization", placeholder="Specialization", autocomplete="off") }}
+                                        <label for="specialization">{{ form.specialization.label.text }}</label>
+                                        {% for error in form.specialization.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>
                             <div class="form-floating mb-3">
-                                {{ form.experience(class="form-control", type="number", min="0", placeholder="Years of Experience") }}
-                                {{ form.experience.label }}
+                                {{ form.experience(class="form-control", id="experience", type="number", min="0", placeholder="Years of Experience", autocomplete="off") }}
+                                <label for="experience">{{ form.experience.label.text }}</label>
+                                {% for error in form.experience.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
                             </div>
                         </div>
 
@@ -144,34 +180,49 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
-                                        {{ form.company_name(class="form-control", placeholder="Company Name") }}
-                                        {{ form.company_name.label }}
+                                        {{ form.company_name(class="form-control", id="company_name", placeholder="Company Name", autocomplete="off") }}
+                                        <label for="company_name">{{ form.company_name.label.text }}</label>
+                                        {% for error in form.company_name.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
-                                        {{ form.industry(class="form-control", placeholder="Industry") }}
-                                        {{ form.industry.label }}
+                                        {{ form.industry(class="form-control", id="industry", placeholder="Industry", autocomplete="off") }}
+                                        <label for="industry">{{ form.industry.label.text }}</label>
+                                        {% for error in form.industry.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
-                                        {{ form.location(class="form-control", placeholder="Location") }}
-                                        {{ form.location.label }}
+                                        {{ form.location(class="form-control", id="location", placeholder="Location", autocomplete="off") }}
+                                        <label for="location">{{ form.location.label.text }}</label>
+                                        {% for error in form.location.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
-                                        {{ form.company_size(class="form-control", type="number", min="1", placeholder="Company Size") }}
-                                        {{ form.company_size.label }}
+                                        {{ form.company_size(class="form-control", id="company_size", type="number", min="1", placeholder="Company Size", autocomplete="off") }}
+                                        <label for="company_size">{{ form.company_size.label.text }}</label>
+                                        {% for error in form.company_size.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>
                             <div class="form-floating mb-3">
-                                {{ form.founded_date(class="form-control", type="date") }}
-                                {{ form.founded_date.label }}
+                                {{ form.founded_date(class="form-control", id="founded_date", type="date", autocomplete="off") }}
+                                <label for="founded_date">{{ form.founded_date.label.text }}</label>
+                                {% for error in form.founded_date.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
                             </div>
                         </div>
 
@@ -228,22 +279,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const strengthBar = document.querySelector('#passwordStrength .progress-bar');
     const strengthText = document.getElementById('strengthText');
 
+    // Defensive checks for debugging
+    if (!userTypeSelect) { alert("User type select not found!"); }
+    if (!studentFields) { alert("Student fields not found!"); }
+    if (!instructorFields) { alert("Instructor fields not found!"); }
+    if (!companyFields) { alert("Company fields not found!"); }
+
     // Toggle role-specific fields
     function toggleFields() {
-        const allFields = [studentFields, instructorFields, companyFields];
-        allFields.forEach(field => field.style.display = 'none');
-
-        switch(userTypeSelect.value) {
-            case 'student':
-                studentFields.style.display = 'block';
-                break;
-            case 'instructor':
-                instructorFields.style.display = 'block';
-                break;
-            case 'company':
-                companyFields.style.display = 'block';
-                break;
-        }
+        studentFields.style.display = 'none';
+        instructorFields.style.display = 'none';
+        companyFields.style.display = 'none';
+        if (userTypeSelect.value === 'student') studentFields.style.display = 'block';
+        if (userTypeSelect.value === 'instructor') instructorFields.style.display = 'block';
+        if (userTypeSelect.value === 'company') companyFields.style.display = 'block';
         updateProgress();
     }
 
@@ -280,22 +329,24 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Event listeners
-    userTypeSelect.addEventListener('change', toggleFields);
-    form.addEventListener('input', updateProgress);
-    passwordInput.addEventListener('input', (e) => checkPasswordStrength(e.target.value));
+    if (userTypeSelect) userTypeSelect.addEventListener('change', toggleFields);
+    if (form) form.addEventListener('input', updateProgress);
+    if (passwordInput) passwordInput.addEventListener('input', (e) => checkPasswordStrength(e.target.value));
 
     // Form validation
-    form.addEventListener('submit', function(event) {
-        if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        form.classList.add('was-validated');
-    });
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    }
 
     // Initialize
-    toggleFields();
-    updateProgress();
+    if (userTypeSelect) toggleFields();
+    if (form) updateProgress();
 });
 </script>
 {% endblock %}

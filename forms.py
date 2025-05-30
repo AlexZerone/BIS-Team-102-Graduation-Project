@@ -1,86 +1,43 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, EmailField, SubmitField, SelectField, DateField, FloatField, IntegerField, TextAreaField
-from wtforms.validators import DataRequired, Length, Email, EqualTo
+from wtforms import (
+    StringField, PasswordField, EmailField, SubmitField, SelectField,
+    DateField, FloatField, IntegerField, TextAreaField
+)
+from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange, Optional
 
 
-# Auth Forms
-class RegistrationForm(FlaskForm):
-    first_name = StringField('First Name', validators=[DataRequired(), Length(min=2, max=50)])
-    last_name = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=50)])
-    email = EmailField('Email', validators=[DataRequired(), Email()])
+class RegisterForm(FlaskForm):
+    first_name = StringField('First Name', validators=[DataRequired(), Length(max=64)])
+    last_name = StringField('Last Name', validators=[DataRequired(), Length(max=64)])
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=128)])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    user_type = SelectField('User Type', 
-                          choices=[('student', 'Student'), 
-                                 ('instructor', 'Instructor'), 
-                                 ('company', 'Company')],
-                          validators=[DataRequired()])
+    user_type = SelectField('Account Type', choices=[
+        ('student', 'Student'),
+        ('instructor', 'Instructor'),
+        ('company', 'Company')
+    ], validators=[DataRequired()])
     
+
     # Student fields
-    university = StringField('University')
-    major = StringField('Major')
-    gpa = FloatField('GPA')
-    expected_graduation_date = DateField('Expected Graduation Date', format='%Y-%m-%d')
-    
+    university = StringField('University', validators=[Optional(), Length(max=128)])
+    major = StringField('Major', validators=[Optional(), Length(max=64)])
+    gpa = FloatField('GPA', validators=[Optional(), NumberRange(min=0, max=4)])
+    expected_graduation_date = DateField('Expected Graduation Date', validators=[Optional()], format='%Y-%m-%d')
+
     # Instructor fields
-    department = StringField('Department')
-    specialization = StringField('Specialization')
-    experience = IntegerField('Years of Experience')
-    
+    department = StringField('Department', validators=[Optional(), Length(max=128)])
+    specialization = StringField('Specialization', validators=[Optional(), Length(max=128)])
+    experience = IntegerField('Years of Experience', validators=[Optional(), NumberRange(min=0)])
+
     # Company fields
-    company_name = StringField('Company Name')
-    industry = StringField('Industry')
-    location = StringField('Location')
-    company_size = StringField('Company Size')
-    founded_date = DateField('Founded Date', format='%Y-%m-%d')
+    company_name = StringField('Company Name', validators=[Optional(), Length(max=128)])
+    industry = StringField('Industry', validators=[Optional(), Length(max=128)])
+    location = StringField('Location', validators=[Optional(), Length(max=128)])
+    company_size = IntegerField('Company Size', validators=[Optional(), NumberRange(min=1)])
+    founded_date = DateField('Founded Date', validators=[Optional()], format='%Y-%m-%d')
 
-    def validate(self, *args, **kwargs):
-        initial_validation = super(RegistrationForm, self).validate(*args, **kwargs)
-        if not initial_validation:
-            return False
+    submit = SubmitField('Create Account')
 
-        if self.user_type.data == 'student':
-            if not self.university.data:
-                self.university.errors.append('University is required for students')
-                return False
-            if not self.major.data:
-                self.major.errors.append('Major is required for students')
-                return False
-            if not self.gpa.data:
-                self.gpa.errors.append('GPA is required for students')
-                return False
-            if not self.expected_graduation_date.data:
-                self.expected_graduation_date.errors.append('Expected graduation date is required for students')
-                return False
-
-        elif self.user_type.data == 'instructor':
-            if not self.department.data:
-                self.department.errors.append('Department is required for instructors')
-                return False
-            if not self.specialization.data:
-                self.specialization.errors.append('Specialization is required for instructors')
-                return False
-            if not self.experience.data:
-                self.experience.errors.append('Years of experience is required for instructors')
-                return False
-
-        elif self.user_type.data == 'company':
-            if not self.company_name.data:
-                self.company_name.errors.append('Company name is required')
-                return False
-            if not self.industry.data:
-                self.industry.errors.append('Industry is required')
-                return False
-            if not self.location.data:
-                self.location.errors.append('Location is required')
-                return False
-            if not self.company_size.data:
-                self.company_size.errors.append('Company size is required')
-                return False
-            if not self.founded_date.data:
-                self.founded_date.errors.append('Founded date is required')
-                return False
-
-        return True
 
 
 class LoginForm(FlaskForm):
@@ -89,25 +46,22 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
-
 # Profile Form
 class ProfileForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
 
+
 class PasswordChangeForm(FlaskForm):
     current_password = PasswordField('Current Password', validators=[DataRequired()])
-    new_password = PasswordField('New Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password', 
-                                   validators=[DataRequired(), EqualTo('new_password')])
+    new_password = PasswordField('New Password', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('new_password')])
 
 
 class CourseForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
+    title = StringField('Title', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('Description')
     start_date = DateField('Start Date', validators=[DataRequired()])
     end_date = DateField('End Date', validators=[DataRequired()])
-    duration = StringField('Duration', validators=[DataRequired()])
-
-
+    duration = StringField('Duration', validators=[DataRequired(), Length(max=50)])

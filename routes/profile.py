@@ -7,9 +7,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from werkzeug.utils import secure_filename
 
-
-
-
 profile_bp = Blueprint('profile', __name__)
 
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx'}
@@ -105,7 +102,6 @@ def change_password():
                     WHERE UserID = %s
                 ''', (new_password_hash, session['user_id']))
                 
-                
                 flash('Password changed successfully', 'success')
             else:
                 flash('Current password is incorrect', 'danger')
@@ -153,7 +149,6 @@ def upload_resume():
             filename = secure_filename(file.filename)
             file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
 
-            
             # Update database with resume information
             execute_query('''
                 UPDATE students 
@@ -169,7 +164,6 @@ def upload_resume():
     
     return redirect(url_for('profile.profile'))
 
-
 # User Settings Route
 @profile_bp.route('/settings', methods=['GET', 'POST'])
 @login_required
@@ -182,11 +176,12 @@ def settings():
             confirm_password = request.form.get('confirm_password')
 
             if new_password and new_password == confirm_password:
+                new_password_hash = generate_password_hash(new_password)
                 execute_query('''
                     UPDATE users 
                     SET Password = %s
                     WHERE UserID = %s
-                ''', (new_password, user_id))
+                ''', (new_password_hash, user_id))
                 flash('Password updated successfully', 'success')
             else:
                 flash('Passwords do not match', 'danger')

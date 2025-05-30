@@ -3,10 +3,7 @@ from models import get_record, get_records, execute_query
 from permissions import login_required, role_required
 from extensions import mysql
 
-
-
 assignments_bp = Blueprint('assignments', __name__)
-
 
 # ✅ **Optimized Assignments Route**
 @assignments_bp.route('/assignments')
@@ -66,8 +63,6 @@ def assignments():
     except Exception as e:
         flash(f'Error loading assignments: {str(e)}', 'danger')
         return render_template('assignments.html', assessments=[], user_type=user_type)
-
-
 
 @assignments_bp.route('/assessment/<int:AssessID>')
 @login_required
@@ -254,14 +249,3 @@ def create_assessment():
     except Exception as e:
         flash(f'Error creating assessment: {str(e)}', 'danger')
         return redirect(url_for('assignments.assignments'))
-
-
-
-
-
-
-
-
-
-
-

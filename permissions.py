@@ -1,7 +1,6 @@
 from flask import redirect, url_for, flash, session
 from functools import wraps
 
-
 # Permissions
 def login_required(f):
     @wraps(f)

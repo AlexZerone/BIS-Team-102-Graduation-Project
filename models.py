@@ -1,12 +1,11 @@
-from flask_mysqldb import MySQLdb, MySQL
+from flask_mysqldb import MySQLdb
 import MySQLdb.cursors
 from extensions import mysql
 
+# ✅ Utility Functions
 
 
-# ✅ **Utility Functions**
-
-# Fetch a single record 
+# Fetch a single record
 def get_record(query, params=()):
     try:
         with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
@@ -15,7 +14,6 @@ def get_record(query, params=()):
     except Exception as e:
         print(f"DB Error in get_record: {e}")
         return None
-
 
 # Fetch multiple records
 def get_records(query, params=()):
@@ -33,63 +31,71 @@ def execute_query(query, params=()):
         with mysql.connection.cursor() as cursor:
             cursor.execute(query, params)
             mysql.connection.commit()
+            return True
     except Exception as e:
         print(f"DB Error in execute_query: {e}")
-        return None
-
-
+        mysql.connection.rollback()
+        return False
 
 # Helper Functions
 def get_user_stats(user_id, user_type):
     stats = {}
     try:
         if user_type == 'student':
-            # Get enrolled courses
+            # Get enrolled courses (use course_registrations and StudentID)
+            student = get_record('SELECT StudentID FROM students WHERE UserID = %s', (user_id,))
+            student_id = student['StudentID'] if student else None
+
             stats['enrolled_courses'] = get_record(
-                'SELECT COUNT(*) as count FROM enrollments WHERE UserID = %s', 
-                (user_id,)
-            )['count']
-            
-            # Get completed courses
+                'SELECT COUNT(*) as count FROM course_registrations WHERE StudentID = %s',
+                (student_id,)
+            )['count'] if student_id else 0
+
             stats['completed_courses'] = get_record(
-                'SELECT COUNT(*) as count FROM enrollments WHERE UserID = %s AND Status = "completed"', 
-                (user_id,)
-            )['count']
-            
-            # Get job applications
+                'SELECT COUNT(*) as count FROM course_registrations WHERE StudentID = %s AND Status = "Completed"',
+                (student_id,)
+            )['count'] if student_id else 0
+
             stats['job_applications'] = get_record(
-                'SELECT COUNT(*) as count FROM job_applications WHERE UserID = %s', 
-                (user_id,)
-            )['count']
-            
+                'SELECT COUNT(*) as count FROM job_applications WHERE StudentID = %s',
+                (student_id,)
+            )['count'] if student_id else 0
+
         elif user_type == 'instructor':
+            # Get instructor's ID
+            instructor = get_record('SELECT InstructorID FROM instructors WHERE UserID = %s', (user_id,))
+            instructor_id = instructor['InstructorID'] if instructor else None
+
             # Get teaching courses
             stats['teaching_courses'] = get_record(
-                'SELECT COUNT(*) as count FROM courses WHERE InstructorID = %s', 
-                (user_id,)
-            )['count']
-            
-            # Get total students
+                'SELECT COUNT(*) as count FROM instructor_courses WHERE InstructorID = %s',
+                (instructor_id,)
+            )['count'] if instructor_id else 0
+
+            # Get total students (distinct students in instructor's courses)
             stats['total_students'] = get_record(
-                '''SELECT COUNT(DISTINCT e.UserID) as count 
-                   FROM enrollments e 
-                   JOIN courses c ON e.CourseID = c.CourseID 
-                   WHERE c.InstructorID = %s''', 
-                (user_id,)
-            )['count']
-            
-            # Get total assessments
+                '''
+                SELECT COUNT(DISTINCT cr.StudentID) as count
+                FROM instructor_courses ic
+                JOIN course_registrations cr ON ic.CourseID = cr.CourseID
+                WHERE ic.InstructorID = %s
+                ''',
+                (instructor_id,)
+            )['count'] if instructor_id else 0
+
+            # Get total assessments in instructor's courses
             stats['total_assessments'] = get_record(
-                '''SELECT COUNT(*) as count 
-                   FROM assignments 
-                   WHERE CourseID IN (SELECT CourseID FROM courses WHERE InstructorID = %s)''', 
-                (user_id,)
-            )['count']
-            
+                '''
+                SELECT COUNT(*) as count
+                FROM assessments a
+                JOIN instructor_courses ic ON a.CourseID = ic.CourseID
+                WHERE ic.InstructorID = %s
+                ''',
+                (instructor_id,)
+            )['count'] if instructor_id else 0
+
     except Exception as e:
         print(f"Error getting user stats: {e}")
         return {}
-    
+
     return stats
-
-
