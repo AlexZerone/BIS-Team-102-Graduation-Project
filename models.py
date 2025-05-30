@@ -5,25 +5,37 @@ from extensions import mysql
 
 
 # ✅ **Utility Functions**
+
+# Fetch a single record 
 def get_record(query, params=()):
-    """ Fetch a single record """
-    with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
-        cursor.execute(query, params)
-        return cursor.fetchone()
+    try:
+        with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
+            cursor.execute(query, params)
+            return cursor.fetchone()
+    except Exception as e:
+        print(f"DB Error in get_record: {e}")
+        return None
 
 
+# Fetch multiple records
 def get_records(query, params=()):
-    """ Fetch multiple records """
-    with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
-        cursor.execute(query, params)
-        return cursor.fetchall()
+    try:
+        with mysql.connection.cursor(MySQLdb.cursors.DictCursor) as cursor:
+            cursor.execute(query, params)
+            return cursor.fetchall()
+    except Exception as e:
+        print(f"DB Error in get_records: {e}")
+        return None
 
-
+# Execute an INSERT, UPDATE, or DELETE query
 def execute_query(query, params=()):
-    """ Execute an INSERT, UPDATE, or DELETE query """
-    with mysql.connection.cursor() as cursor:
-        cursor.execute(query, params)
-        mysql.connection.commit()
+    try:
+        with mysql.connection.cursor() as cursor:
+            cursor.execute(query, params)
+            mysql.connection.commit()
+    except Exception as e:
+        print(f"DB Error in execute_query: {e}")
+        return None
 
 
 

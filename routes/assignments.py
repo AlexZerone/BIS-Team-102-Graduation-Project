@@ -69,10 +69,10 @@ def assignments():
 
 
 
-@assignments_bp.route('/assessment/<int:assess_id>')
+@assignments_bp.route('/assessment/<int:AssessID>')
 @login_required
 @role_required(['student', 'instructor'])
-def assessment_detail(assess_id):
+def assessment_detail(AssessID):
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
     
@@ -82,7 +82,7 @@ def assessment_detail(assess_id):
             FROM assessments a
             JOIN courses c ON a.CourseID = c.CourseID
             WHERE a.AssessID = %s
-        ''', (assess_id,))
+        ''', (AssessID,))
         
         if not assessment:
             flash('Assessment not found', 'danger')
@@ -97,7 +97,7 @@ def assessment_detail(assess_id):
                 submission = get_record('''
                     SELECT * FROM student_assessments 
                     WHERE AssessID = %s AND StudentID = %s
-                ''', (assess_id, student['StudentID']))
+                ''', (AssessID, student['StudentID']))
         
         # Get all submissions if user is instructor
         submissions = None
@@ -108,7 +108,7 @@ def assessment_detail(assess_id):
                 JOIN students s ON sa.StudentID = s.StudentID
                 JOIN users u ON s.UserID = u.UserID
                 WHERE sa.AssessID = %s
-            ''', (assess_id,))
+            ''', (AssessID,))
         
         return render_template('assessment_detail.html', 
                              assessment=assessment,
@@ -153,10 +153,10 @@ def manage_assignments():
         return render_template('manage_assignments.html', assignments=[])
 
 
-@assignments_bp.route('/submit-assessment/<int:assess_id>', methods=['POST'])
+@assignments_bp.route('/submit-assessment/<int:AssessID>', methods=['POST'])
 @login_required
 @role_required(['student'])
-def submit_assessment(assess_id):
+def submit_assessment(AssessID):
     if 'user_id' not in session:
         flash('Please log in to submit the assignment', 'warning')
         return redirect(url_for('auth.login'))
@@ -174,13 +174,13 @@ def submit_assessment(assess_id):
         content = request.form.get('content', '').strip()
         if not content:
             flash('Submission content is required', 'danger')
-            return redirect(url_for('assignments.assessment_detail', assess_id=assess_id))
+            return redirect(url_for('assignments.assessment_detail', AssessID=AssessID))
 
         # Check if already submitted
         existing = get_record('''
             SELECT * FROM student_assessments
             WHERE StudentID = %s AND AssessID = %s
-        ''', (student_id, assess_id))
+        ''', (student_id, AssessID))
 
         if existing:
             # Update existing submission
@@ -188,7 +188,7 @@ def submit_assessment(assess_id):
                 UPDATE student_assessments
                 SET Content = %s, SubmissionDate = NOW(), Status = 'Submitted'
                 WHERE StudentID = %s AND AssessID = %s
-            ''', (content, student_id, assess_id))
+            ''', (content, student_id, AssessID))
             flash('Assignment updated successfully', 'success')
         else:
             # Insert new submission
@@ -196,14 +196,14 @@ def submit_assessment(assess_id):
                 INSERT INTO student_assessments
                 (StudentID, AssessID, SubmissionDate, Status, Content)
                 VALUES (%s, %s, NOW(), 'Submitted', %s)
-            ''', (student_id, assess_id, content))
+            ''', (student_id, AssessID, content))
             flash('Assignment submitted successfully', 'success')
 
-        return redirect(url_for('assignments.assessment_detail', assess_id=assess_id))
+        return redirect(url_for('assignments.assessment_detail', AssessID=AssessID))
 
     except Exception as e:
         flash(f'Error submitting assignment: {str(e)}', 'danger')
-        return redirect(url_for('assignments.assessment_detail', assess_id=assess_id))
+        return redirect(url_for('assignments.assessment_detail', AssessID=AssessID))
 
 @assignments_bp.route('/create-assessment', methods=['GET', 'POST'])
 @login_required

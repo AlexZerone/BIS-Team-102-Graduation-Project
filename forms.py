@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, EmailField, SubmitField, SelectField, DateField, FloatField, IntegerField
+from wtforms import StringField, PasswordField, EmailField, SubmitField, SelectField, DateField, FloatField, IntegerField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 
@@ -101,3 +101,13 @@ class PasswordChangeForm(FlaskForm):
     new_password = PasswordField('New Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', 
                                    validators=[DataRequired(), EqualTo('new_password')])
+
+
+class CourseForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    description = TextAreaField('Description')
+    start_date = DateField('Start Date', validators=[DataRequired()])
+    end_date = DateField('End Date', validators=[DataRequired()])
+    duration = StringField('Duration', validators=[DataRequired()])
+
+

@@ -13,6 +13,7 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
+    
     if request.method == 'POST':
         try:
             # Start transaction

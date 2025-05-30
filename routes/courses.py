@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, session, Blueprint
 from models import get_record, get_records, execute_query
 from permissions import login_required, role_required
+from forms import CourseForm
 
 
 
@@ -114,30 +115,29 @@ def enrolled_courses():
 @login_required
 @role_required(['instructor'])
 def create_course():
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
+    form = CourseForm()
 
-    if request.method == 'POST':
-        title = request.form.get('title')
-        description = request.form.get('description')
-        start_date = request.form.get('start_date')
-        end_date = request.form.get('end_date')
-        duration = request.form.get('duration')
-
-        if not title or not start_date or not end_date:
-            flash('Please fill in all required fields.', 'danger')
-            return render_template('create_course.html')
+    if form.validate_on_submit():
+        title = form.title.data
+        description = form.description.data
+        start_date = form.start_date.data.strftime('%Y-%m-%d')  # Convert to string
+        end_date = form.end_date.data.strftime('%Y-%m-%d')      # Convert to string
+        duration = form.duration.data
 
         try:
-            # Step 1: Insert into courses table
-            course_id = execute_query('''
+            cursor = mysql.connection.cursor()
+
+            # Insert into 'courses' table
+            cursor.execute('''
                 INSERT INTO courses (Title, Description, StartDate, EndDate, Duration)
                 VALUES (%s, %s, %s, %s, %s)
-                RETURNING CourseID
-            ''', (title, description, start_date, end_date, duration), fetch_one=True)['CourseID']
+            ''', (title, description, start_date, end_date, duration))
 
-            # Step 2: Link course to the instructor
-            execute_query('''
+            # Get the new CourseID
+            course_id = cursor.lastrowid
+
+            # Link instructor to course
+            cursor.execute('''
                 INSERT INTO instructor_courses (InstructorID, CourseID)
                 VALUES (
                     (SELECT InstructorID FROM instructors WHERE UserID = %s),
@@ -145,13 +145,19 @@ def create_course():
                 )
             ''', (session['user_id'], course_id))
 
+            mysql.connection.commit()
             flash('Course created successfully!', 'success')
             return redirect(url_for('courses.courses'))
 
         except Exception as e:
+            mysql.connection.rollback()
             flash(f'Error creating course: {str(e)}', 'danger')
 
-    return render_template('create_course.html')
+        finally:
+            cursor.close()
+
+    return render_template('create_course.html', form=form)
+
 
 @courses_bp.route('/course/manage_courses')
 @login_required
