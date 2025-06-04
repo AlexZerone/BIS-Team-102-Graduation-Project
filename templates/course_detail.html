@@ -73,7 +73,7 @@
                                     <p class="card-text">{{ assessment.Description }}</p>
                                     <p class="mb-0">
                                         <span class="badge bg-primary">Max Score: {{ assessment.MaxScore }}</span>
-                                        <span class="badge bg-info">Weight: {{ assessment.Weight }}%</span>
+                                        <span class="badge bg-info">Weight: {{ (assessment.Weight * 100)|round|int }}%</span>
                                     </p>
                                 </div>
                                 <div class="text-end">

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+
 {% block title %}Create Assessment{% endblock %}
 
 {% block content %}
@@ -15,9 +16,8 @@
                 </div>
             {% endfor %}
         {% endif %}
-    {% endwith %}
-
-    <form method="POST" action="{{ url_for('assignments.create_assessment') }}">
+    {% endwith %}    <form method="POST" action="{{ url_for('assignments.create_assessment') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group mb-3">
             <label for="title">Assessment Title</label>
             <input type="text" class="form-control" id="title" name="title" placeholder="Enter assessment title" required>
@@ -31,9 +31,7 @@
         <div class="form-group mb-3">
             <label for="due_date">Due Date</label>
             <input type="date" class="form-control" id="due_date" name="due_date" required>
-        </div>
-
-        <div class="form-group mb-4">
+        </div>        <div class="form-group mb-3">
             <label for="course_id">Select Course</label>
             <select class="form-control" id="course_id" name="course_id" required>
                 <option value="">-- Select a course --</option>
@@ -41,6 +39,18 @@
                     <option value="{{ course.CourseID }}">{{ course.Title }}</option>
                 {% endfor %}
             </select>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="max_score">Maximum Score</label>
+            <input type="number" class="form-control" id="max_score" name="max_score" value="100" min="0" step="1" required>
+            <small class="form-text text-muted">The maximum points available for this assessment.</small>
+        </div>
+
+        <div class="form-group mb-4">
+            <label for="weight">Weight (%)</label>
+            <input type="number" class="form-control" id="weight" name="weight" value="10" min="0" max="100" step="1" required>
+            <small class="form-text text-muted">The percentage weight of this assessment in the final course grade.</small>
         </div>
 
         <button type="submit" class="btn btn-primary">Create Assessment</button>

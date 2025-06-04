@@ -320,17 +320,24 @@
                     <a href="#" class="text-decoration-none small">View Calendar</a>
                 </div>
                 <div class="card-body p-0">
-                    <ul class="list-group list-group-flush">
-                        {% if upcoming_items %}
+                    <ul class="list-group list-group-flush">                        {% if upcoming_items %}
                             {% for item in upcoming_items %}
                                 <li class="list-group-item py-3">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             <p class="mb-0 fw-medium">{{ item.title }}</p>
                                             <small class="text-muted">{{ item.subtitle }}</small>
-                                        </div>
-                                        <span class="badge {% if item.days_left <= 1 %}bg-danger{% elif item.days_left <= 3 %}bg-warning{% else %}bg-primary{% endif %} rounded-pill">
+                                        </div>                                        <span class="badge {% if item.days_left is defined and item.days_left <= 1 %}bg-danger{% elif item.days_left is defined and item.days_left <= 3 %}bg-warning{% else %}bg-primary{% endif %} rounded-pill">
                                             {{ item.date }}
+                                            {% if item.days_left is defined %}
+                                                {% if item.days_left == 0 %}
+                                                    (Today)
+                                                {% elif item.days_left == 1 %}
+                                                    (Tomorrow)
+                                                {% else %}
+                                                    ({{ item.days_left }} days)
+                                                {% endif %}
+                                            {% endif %}
                                         </span>
                                     </div>
                                 </li>
