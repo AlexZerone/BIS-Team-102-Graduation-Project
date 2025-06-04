@@ -20,26 +20,26 @@ def register():
         # Insert user
         password_hash = generate_password_hash(form.password.data)
         execute_query('''
-            INSERT INTO users (First, Last, Email, Password, UserType)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO users (First, Last, Email, Password, UserType, CreatedAt, UpdatedAt, Status)
+            VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), 'Active')
         ''', (form.first_name.data, form.last_name.data, form.email.data, password_hash, form.user_type.data))
         user = get_record('SELECT * FROM users WHERE Email = %s', (form.email.data,))
         user_id = user['UserID']
         # Insert profile data based on user type
         if form.user_type.data == 'student':
             execute_query('''
-                INSERT INTO students (UserID, University, Major, GPA, ExpectedGraduationDate)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO students (UserID, University, Major, GPA, ExpectedGraduationDate, CreatedAt, UpdatedAt)
+                VALUES (%s, %s, %s, %s, %s, NOW(), NOW())
             ''', (user_id, form.university.data, form.major.data, form.gpa.data, form.expected_graduation_date.data))
         elif form.user_type.data == 'instructor':
             execute_query('''
-                INSERT INTO instructors (UserID, Department, Specialization, Experience)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO instructors (UserID, Department, Specialization, Experience, CreatedAt, UpdatedAt)
+                VALUES (%s, %s, %s, %s, NOW(), NOW())
             ''', (user_id, form.department.data, form.specialization.data, form.experience.data))
         elif form.user_type.data == 'company':
             execute_query('''
-                INSERT INTO companies (UserID, Name, Industry, Location, CompanySize, FoundedDate)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO companies (UserID, Name, Industry, Location, CompanySize, FoundedDate, CreatedAt, UpdatedAt)
+                VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
             ''', (user_id, form.company_name.data, form.industry.data, form.location.data, form.company_size.data, form.founded_date.data))
         flash('Account created successfully! You can now log in.', 'success')
         return redirect(url_for('auth.login'))
@@ -58,10 +58,10 @@ def login():
         if user and check_password_hash(user['Password'], password):
             session['user_id'] = user['UserID']
             session['user_type'] = user['UserType']
-            # Optionally: session['user_name'] = user['First'] + " " + user['Last']
+            session['user_name'] = user['First'] + " " + user['Last']
 
             try:
-                execute_query('UPDATE users SET LastLoginDate = NOW() WHERE UserID = %s', (user['UserID'],))
+                execute_query('UPDATE users SET UpdatedAt = NOW() WHERE UserID = %s', (user['UserID'],))
             except Exception as e:
                 flash(f"Database error: {str(e)}", "danger")
 
