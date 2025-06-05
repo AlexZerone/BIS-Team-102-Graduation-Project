@@ -2,8 +2,6 @@ from flask import render_template, request, redirect, url_for, flash, session, B
 from models import get_record, get_records, execute_query
 from permissions import login_required, role_required
 from extensions import mysql
-import sys
-import traceback
 
 
 jobs_bp = Blueprint('jobs', __name__)
@@ -27,16 +25,15 @@ def jobs():
                 return redirect(url_for("dashboard.dashboard"))
             
             student_id = student['StudentID']
-            
+
             # Optimized query: fetch jobs and application status in one go
             jobs = get_records('''
                 SELECT j.*, c.Name AS CompanyName, 
-                       COALESCE(ast.Name, 'Not Applied') AS ApplicationStatus,
+                       COALESCE(ja.Status, 'Not Applied') AS ApplicationStatus,
                        ja.ApplicationDate
                 FROM jobs j
                 JOIN companies c ON j.CompanyID = c.CompanyID
                 LEFT JOIN job_applications ja ON j.JobID = ja.JobID AND ja.StudentID = %s
-                LEFT JOIN application_statuses ast ON ja.StatusID = ast.StatusID
                 WHERE j.DeadlineDate >= CURDATE()
                 ORDER BY j.PostingDate DESC
             ''', (student_id,))
@@ -218,9 +215,9 @@ def edit_job(job_id):
 @role_required(['company'])
 def create_job():
     """Route for companies to create a new job posting"""
+    user_id = session['user_id']
+    
     try:
-        user_id = session['user_id']
-        
         # Get company ID
         company = get_record('SELECT CompanyID FROM companies WHERE UserID = %s', (user_id,))
         if not company:
@@ -258,11 +255,9 @@ def create_job():
             return redirect(url_for('jobs.manage_jobs'))
         
         # GET request: show the job creation form
-        print("DEBUG: About to render create_job.html template", file=sys.stderr)
         return render_template('create_job.html')
+    
     except Exception as e:
-        print(f"ERROR in create_job: {str(e)}", file=sys.stderr)
-        print(traceback.format_exc(), file=sys.stderr)
         flash(f"Error creating job: {str(e)}", "danger")
         return redirect(url_for('jobs.manage_jobs'))
 

@@ -1,13 +1,12 @@
 import os
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or '159357'
-
-    # MySQL Configuration
+    SECRET_KEY = os.environ.get('SECRET_KEY') or '159357'    # MySQL Configuration
     MYSQL_HOST = 'localhost'
     MYSQL_USER = 'root'
     MYSQL_PASSWORD = ''
     MYSQL_DB = 'flask0'
+    MYSQL_PORT = 3306  # Default MySQL port
 
     # Security configurations
 #    SESSION_COOKIE_HTTPONLY = True

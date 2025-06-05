@@ -253,15 +253,20 @@ class UXUtils {
         });
     }
 }
+let mimetype = 'application/javascript'; // Define it properly
 
 /**
  * Service Worker Registration - For offline capability & PWA support
  */
 class ServiceWorkerManager {
+    
     static init() {
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/static/sw.js')
+                navigator.serviceWorker.register('/static/js/sw.js', mimetype= 'application/javascript',{
+                    type: 'module', // Valid options: 'classic' or 'module'
+                    scope: '/register'
+                } )
                     .then(registration => {
                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
                     })

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Review Applications{% endblock %}
+
+{% block extra_css %}
+<style>
+    .application-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .cover-letter {
+        white-space: pre-wrap;
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 5px;
+        margin-bottom: 1rem;
+    }
+    
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-left: 30px;
+        padding-bottom: 20px;
+        border-left: 2px solid #dee2e6;
+        margin-left: 10px;
+    }
+    
+    .timeline-item::before {
+        content: "";
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #007bff;
+        left: -7px;
+        top: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Applications for {{ job.Title }}</h2>
+            <p class="text-muted">Posted on {{ job.PostingDate.strftime('%Y-%m-%d') }}</p>
+        </div>
+        <div>
+            <a href="{{ url_for('jobs.manage_jobs') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Jobs
+            </a>
+        </div>
+    </div>
+
+    {% if applications %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ applications|length }} Applications Received</h5>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% for application in applications %}
+                            <div class="application-card">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5>{{ application.First }} {{ application.Last }}</h5>
+                                        <p class="mb-1">
+                                            <i class="fas fa-envelope me-2"></i> {{ application.Email }}
+                                        </p>
+                                        <p class="mb-2">
+                                            <span class="badge bg-{{ 'success' if application.StatusName == 'Accepted' else 'warning' if application.StatusName == 'Pending' else 'secondary' }} status-badge">
+                                                {{ application.StatusName }}
+                                            </span>
+                                            <small class="text-muted ms-2">Applied on {{ application.ApplicationDate.strftime('%Y-%m-%d') }}</small>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4 text-md-end">
+                                        <button class="btn btn-sm btn-outline-primary" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#coverLetter{{ application.ApplicationID }}">
+                                            View Cover Letter
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-success ms-2" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#statusModal{{ application.ApplicationID }}">
+                                            Update Status
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="collapse mt-3" id="coverLetter{{ application.ApplicationID }}">
+                                    <div class="cover-letter">{{ application.CoverLetter }}</div>
+                                </div>
+                                
+                                <hr>
+                                
+                                <!-- Status Update Modal -->
+                                <div class="modal fade" id="statusModal{{ application.ApplicationID }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">                                            <form action="{{ url_for('jobs.update_application_status', application_id=application.ApplicationID) }}" method="POST">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Update Application Status</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label for="status{{ application.ApplicationID }}" class="form-label">Status</label>
+                                                        <select class="form-select" id="status{{ application.ApplicationID }}" name="status_id">
+                                                            {% for status in statuses %}
+                                                                <option value="{{ status.StatusID }}" 
+                                                                        {{ 'selected' if status.StatusID == application.StatusID }}>
+                                                                    {{ status.Name }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="feedback{{ application.ApplicationID }}" class="form-label">Feedback (Optional)</label>
+                                                        <textarea class="form-control" id="feedback{{ application.ApplicationID }}" name="feedback" rows="3"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-primary">Update Status</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No applications have been submitted for this job posting yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

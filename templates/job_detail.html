@@ -50,15 +50,19 @@
                     <p class="mb-0"><i class="fas fa-money-bill-wave"></i> {{ job.SalaryRange }}</p>
                 </div>
             </div>
-            <div class="col-md-4 text-end">
-                {% if session.user_type == 'student' %}
+            <div class="col-md-4 text-end">                {% if session.user_type == 'student' %}
                     {% if not application %}
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#applyModal">
                             Apply Now
                         </button>
                     {% else %}
                         <div class="alert alert-info application-status">
-                            Application Status: {{ application.Status }}
+                            {% if application.StatusID %}
+                                {% set status_name = {1: 'Pending', 2: 'Under Review', 3: 'Accepted', 4: 'Rejected'}.get(application.StatusID, 'Unknown') %}
+                                Application Status: {{ status_name }}
+                            {% else %}
+                                Application Status: Pending
+                            {% endif %}
                             <br>
                             Applied on: {{ application.ApplicationDate.strftime('%Y-%m-%d') }}
                         </div>
@@ -111,11 +115,8 @@
 <!-- Apply Modal -->
 <div class="modal fade" id="applyModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ url_for('jobs.apply_job', job_id=job.JobID) }}" method="POST">
-                {% if form and form.csrf_token %}
-                    {{ form.csrf_token }}
-                {% endif %}
+        <div class="modal-content">            <form action="{{ url_for('jobs.apply_job', job_id=job.JobID) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-header">
                     <h5 class="modal-title">Apply for {{ job.Title }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

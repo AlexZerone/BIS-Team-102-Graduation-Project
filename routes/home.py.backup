@@ -1,4 +1,3 @@
-# filepath: d:\college\Word\Graduation Project (BIS)\Code\BIS-Team-102-Graduation-Project\routes\home.py
 from flask import render_template, request, redirect, url_for, flash, session, Blueprint
 from datetime import datetime
 from models import get_record, get_records, execute_query
@@ -32,9 +31,7 @@ def post_home():
             student_id = student['StudentID']
             # Number of enrolled courses
             course_count = get_record('SELECT COUNT(*) as count FROM course_registrations WHERE StudentID = %s', (student_id,))
-            stats['enrolled_courses'] = course_count['count'] if course_count else 0
-            
-            # Example: Get upcoming assignments
+            stats['enrolled_courses'] = course_count['count'] if course_count else 0            # Example: Get upcoming assignments
             raw_upcoming_items = get_records('''
                 SELECT a.Type as Title, a.DueDate, c.Title as CourseTitle
                 FROM assessments a
@@ -60,9 +57,7 @@ def post_home():
                     'subtitle': item['CourseTitle'],
                     'date': due_date.strftime('%Y-%m-%d') if due_date else 'No date',
                     'days_left': days_left
-                })
-            
-            # Example: Get recent activities (e.g., submissions)
+                })# Example: Get recent activities (e.g., submissions)
             raw_activities = get_records('''
                 SELECT sa.SubmissionDate, a.Type AS AssessTitle, c.Title AS CourseTitle, sa.Score, sa.Status
                 FROM student_assessments sa
@@ -90,9 +85,7 @@ def post_home():
             instructor_id = instructor['InstructorID']
             # Number of assigned courses
             course_count = get_record('SELECT COUNT(*) as count FROM instructor_courses WHERE InstructorID = %s', (instructor_id,))
-            stats['assigned_courses'] = course_count['count'] if course_count else 0
-            
-            # Example: Get upcoming assessments to grade
+            stats['assigned_courses'] = course_count['count'] if course_count else 0            # Example: Get upcoming assessments to grade
             raw_upcoming_items = get_records('''
                 SELECT a.Type as Title, a.DueDate, c.Title as CourseTitle
                 FROM assessments a
@@ -118,9 +111,7 @@ def post_home():
                     'subtitle': item['CourseTitle'],
                     'date': due_date.strftime('%Y-%m-%d') if due_date else 'No date',
                     'days_left': days_left
-                })
-            
-            # Example: Get recent grading activities
+                })# Example: Get recent grading activities
             raw_activities = get_records('''
                 SELECT sa.SubmissionDate, a.Type AS AssessTitle, c.Title AS CourseTitle, sa.Score,
                        u.First, u.Last
@@ -148,17 +139,13 @@ def post_home():
                     'type': 'assignment',
                     'description': description,
                     'timestamp': activity['SubmissionDate'].strftime('%Y-%m-%d') if activity['SubmissionDate'] else 'N/A'
-                })
-
-    elif user_type == 'company':
+                })    elif user_type == 'company':
         company = get_record('SELECT CompanyID FROM companies WHERE UserID = %s', (user_id,))
         if company:
             company_id = company['CompanyID']
             # Number of active job postings
             job_count = get_record('SELECT COUNT(*) as count FROM jobs WHERE CompanyID = %s AND (DeadlineDate IS NULL OR DeadlineDate >= CURDATE())', (company_id,))
-            stats['active_jobs'] = job_count['count'] if job_count else 0
-            
-            # Recent job applications to company's jobs
+            stats['active_jobs'] = job_count['count'] if job_count else 0            # Recent job applications to company's jobs
             raw_activities = get_records('''
                 SELECT ja.ApplicationDate, ast.Name AS Status, j.Title AS JobTitle, u.First, u.Last
                 FROM job_applications ja
@@ -170,22 +157,19 @@ def post_home():
                 ORDER BY ja.ApplicationDate DESC
                 LIMIT 5
             ''', (company_id,))
-            
-            # Process activities to match template expectations
+              # Process activities to match template expectations
             activities = []
-            for activity in raw_activities:
-                description = f"{activity['First']} {activity['Last']} applied to '{activity['JobTitle']}' - {activity['Status']}"
-                activities.append({
-                    'type': 'job_application',
-                    'description': description,
-                    'timestamp': activity['ApplicationDate'].strftime('%Y-%m-%d') if activity['ApplicationDate'] else 'N/A'
-                })
-            
-            # Upcoming job deadlines
+            if raw_activities:
+                for activity in raw_activities:
+                    description = f"{activity['First']} {activity['Last']} applied for '{activity['JobTitle']}' - {activity['Status'] or 'Pending'}"
+                    activities.append({
+                        'type': 'job',
+                        'description': description,
+                        'timestamp': activity['ApplicationDate'].strftime('%Y-%m-%d') if activity['ApplicationDate'] else 'N/A'
+                    })            # Upcoming job post deadlines
             raw_upcoming_items = get_records('''
-                SELECT Title, DeadlineDate, 
-                       (SELECT COUNT(*) FROM job_applications WHERE JobID = j.JobID) AS ApplicationCount
-                FROM jobs j
+                SELECT Title, DeadlineDate
+                FROM jobs
                 WHERE CompanyID = %s AND DeadlineDate >= CURDATE()
                 ORDER BY DeadlineDate ASC
                 LIMIT 5
@@ -193,56 +177,28 @@ def post_home():
             
             # Process upcoming items to match template expectations
             upcoming_items = []
-            for item in raw_upcoming_items:
-                deadline = item['DeadlineDate']
-                # Safely calculate days_left
-                try:
-                    days_left = (deadline - datetime.now().date()).days if deadline else 0
-                except (TypeError, AttributeError):
-                    days_left = 0
-                
-                upcoming_items.append({
-                    'title': item['Title'],
-                    'subtitle': f"{item['ApplicationCount']} applications",
-                    'date': deadline.strftime('%Y-%m-%d') if deadline else 'No deadline',
-                    'days_left': days_left
-                })
+            if raw_upcoming_items:
+                for item in raw_upcoming_items:
+                    deadline_date = item['DeadlineDate']
+                    # Safely calculate days_left
+                    try:
+                        days_left = (deadline_date - datetime.now().date()).days if deadline_date else 0
+                    except (TypeError, AttributeError):
+                        days_left = 0
+                    
+                    upcoming_items.append({
+                        'title': item['Title'],
+                        'subtitle': 'Job Posting',
+                        'date': deadline_date.strftime('%Y-%m-%d') if deadline_date else 'No date',
+                        'days_left': days_left
+                    })
 
-    # Featured/Recommended content based on user type
-    featured_content = []
-    if user_type == 'student':
-        # Example: Recommend jobs based on latest postings
-        raw_featured = get_records('''
-            SELECT j.JobID, j.Title, c.Name AS CompanyName, j.PostingDate, j.Type
-            FROM jobs j
-            JOIN companies c ON j.CompanyID = c.CompanyID
-            WHERE j.DeadlineDate >= CURDATE()
-            ORDER BY j.PostingDate DESC
-            LIMIT 3
-        ''')
-        
-        for job in raw_featured:
-            featured_content.append({
-                'id': job['JobID'],
-                'title': job['Title'],
-                'subtitle': job['CompanyName'],
-                'type': 'job',
-                'meta': job['Type'],
-                'date': job['PostingDate'].strftime('%Y-%m-%d') if job['PostingDate'] else ''
-            })
-    elif user_type == 'instructor':
-        pass  # Future: could feature courses or teaching resources
-    elif user_type == 'company':
-        pass  # Future: could feature student profiles or analytics
-    
-    # Add current date for display on the home page
-    current_date = datetime.now()
-        
-    return render_template('Post-Login Home.html',
-                          user=user,
+    # Additional logic for other user types can be added similarly
+
+    return render_template('Post-Login Home.html', 
+                          user=user, 
                           user_type=user_type,
-                          stats=stats,
+                          current_date=datetime.now(),
                           activities=activities,
                           upcoming_items=upcoming_items,
-                          featured_content=featured_content,
-                          current_date=current_date)
+                          **stats)
