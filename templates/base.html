@@ -1,50 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sec Era - Your Educational Platform">
-    <meta name="keywords" content="education, courses, learning, online education">
+    <meta name="description" content="Sec Era - Connecting education with innovative security skills and career opportunities">
+    <meta name="keywords" content="education, cybersecurity, courses, learning, professional development">
     <meta name="author" content="Sec Era">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="{% block og_title %}Sec Era{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Connecting education with innovative security skills and career opportunities{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:image" content="{{ url_for('static', filename='img/og-image.png', _external=True) }}">
+    
     <title>{% block title %}Sec Era{% endblock %}</title>
     
     <!-- Favicon and PWA -->
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicon-16x16.png') }}">
     
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" as="style">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" as="style">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" as="script">
     
     <!-- CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    
     
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Accessibility Skip Link -->
+    <a href="#main-content" class="visually-hidden-focusable d-block p-2 bg-primary text-white text-center">
+        Skip to main content
+    </a>
 
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light" role="navigation" aria-label="Main navigation">
+    <nav class="navbar navbar-expand-lg sticky-top bg-white shadow-sm py-2 main-navbar" role="navigation" aria-label="Main navigation">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('home.home') }}">
-                <i class="fas fa-graduation-cap"></i> SE
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('home.home') }}" aria-label="Sec Era Home">
+                <i class="fas fa-graduation-cap"></i> <span class="fw-bold">Sec Era</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                {% if 'user_id' in session %}
+                {% if session.get('user_id') %}
                     {% if session.get('user_type') == 'student' %}
                         {% include 'includes/nav_student.html' %}
                     {% elif session.get('user_type') == 'instructor' %}
                         {% include 'includes/nav_instructor.html' %}
                     {% elif session.get('user_type') == 'company' %}
                         {% include 'includes/nav_company.html' %}
+                    {% else %}
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.endpoint == 'home.home' %}active{% endif %}" 
+                                   href="{{ url_for('home.home') }}">
+                                   <i class="fas fa-home"></i> Home
+                                </a>
+                            </li>
+                        </ul>
                     {% endif %}
                 {% else %}
                     <ul class="navbar-nav me-auto">
@@ -55,39 +77,61 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'home.home' %}active{% endif %}" 
-                               href="{{ url_for('home.home') }}"> <!-- About Us -->
+                            <a class="nav-link {% if request.endpoint == 'home.about' %}active{% endif %}" 
+                               href="{{ url_for('home.about') if 'home.about' in url_for.__self__._rules_by_endpoint else '#' }}">
                                <i class="fas fa-info-circle"></i> About
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'courses.explore' %}active{% endif %}" 
+                               href="{{ url_for('courses.explore') if 'courses.explore' in url_for.__self__._rules_by_endpoint else '#' }}">
+                               <i class="fas fa-book"></i> Courses
                             </a>
                         </li>
                     </ul>
                 {% endif %}
     
                 <!-- Right-aligned items -->
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <!-- Theme Switcher -->
-                    <li class="nav-item">
-                        <button class="btn btn-sm nav-link" id="themeSwitcher">
+                    <li class="nav-item px-2">
+                        <button class="btn btn-sm nav-link theme-switcher-btn" id="themeSwitcher" title="Toggle dark mode" aria-label="Toggle dark mode">
                             <i class="fas fa-moon"></i>
                         </button>
                     </li>
                     
-                    {% if 'user_id' in session %}
+                    {% if session.get('user_id') %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user"></i> {{ session.get('user_name', 'Account') }}
+                                <span class="avatar-circle me-2">{{ session.get('user_name', 'User')[0]|upper }}</span>
+                                <span class="d-none d-md-inline">{{ session.get('user_name', 'Account') }}</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="navbarDropdown">
+                                <li class="dropdown-item-text">
+                                    <div class="small text-muted mb-2">Signed in as</div>
+                                    <div class="fw-bold">{{ session.get('user_name', 'User') }}</div>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('profile.settings') }}">
-                                        <i class="fas fa-cog"></i> Settings
+                                    <a class="dropdown-item" href="{{ url_for('dashboard.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt fa-fw me-2"></i> Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('profile.profile') if 'profile.profile' in url_for.__self__._rules_by_endpoint else '#' }}">
+                                        <i class="fas fa-user fa-fw me-2"></i> My Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('profile.settings') if 'profile.settings' in url_for.__self__._rules_by_endpoint else '#' }}">
+                                        <i class="fas fa-cog fa-fw me-2"></i> Settings
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
-                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                                        <i class="fas fa-sign-out-alt fa-fw me-2"></i> Logout
                                     </a>
                                 </li>
                             </ul>
@@ -96,13 +140,13 @@
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'auth.login' %}active{% endif %}" 
                                href="{{ url_for('auth.login') }}">
-                               <i class="fas fa-sign-in-alt"></i> Login
+                               <i class="fas fa-sign-in-alt me-1"></i> Login
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'auth.register' %}active{% endif %}" 
+                            <a class="nav-link btn btn-primary btn-sm text-white px-3 ms-2 {% if request.endpoint == 'auth.register' %}active{% endif %}" 
                                href="{{ url_for('auth.register') }}">
-                               <i class="fas fa-user-plus"></i> Register
+                               <i class="fas fa-user-plus me-1"></i> Register
                             </a>
                         </li>
                     {% endif %}
@@ -110,159 +154,85 @@
             </div>
         </div>
     </nav>
-    
-
-    <!-- Flash Messages -->
-    <div class="alert-container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
 
     <!-- Loading Spinner -->
-    <div id="loading-spinner" style="display: none;">
+    <div id="loading-spinner" class="position-fixed top-50 start-50 translate-middle bg-white bg-opacity-75 p-3 rounded d-none">
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div id="main-content" class="main-content">
+    <main id="main-content" class="main-content">
         {% block content %}{% endblock %}
-    </div>
+    </main>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTop" class="btn btn-primary rounded-circle position-fixed bottom-0 end-0 m-4 shadow-sm d-none" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer mt-5 py-4 bg-light border-top">
         <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; 2024 Sec Era. All rights reserved.</p>
+            <div class="row g-4">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-graduation-cap fa-2x me-2 text-primary"></i>
+                        <h5 class="mb-0 fw-bold">Sec Era</h5>
+                    </div>
+                    <p class="text-muted small">Connecting education with innovative security skills and career opportunities.</p>
+                    <div class="social-links mt-3">
+                        <a href="#" class="btn btn-sm btn-outline-secondary me-2" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary me-2" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary me-2" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-6 text-end">
-                    <a href="#" class="text-decoration-none text-dark me-3">
-                        <i class="fab fa-facebook"></i>
-                    </a>
-                    <a href="#" class="text-decoration-none text-dark me-3">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="text-decoration-none text-dark me-3">
-                        <i class="fab fa-linkedin"></i>
-                    </a>
-                    <a href="#" class="text-decoration-none text-dark">
-                        <i class="fab fa-instagram"></i>
-                    </a>
+                <div class="col-6 col-md-2 mb-3">
+                    <h6 class="fw-bold mb-3">Quick Links</h6>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2"><a href="{{ url_for('home.home') }}" class="nav-link p-0 text-muted">Home</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">About Us</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Courses</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Contact</a></li>
+                    </ul>
                 </div>
+                <div class="col-6 col-md-2 mb-3">
+                    <h6 class="fw-bold mb-3">Resources</h6>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Help Center</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Blog</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Community</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="fw-bold mb-3">Newsletter</h6>
+                    <p class="text-muted small">Subscribe to get updates on courses and events</p>
+                    <form class="d-flex">
+                        <input type="email" class="form-control form-control-sm me-2" placeholder="Email address" aria-label="Email address">
+                        <button class="btn btn-primary btn-sm" type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="d-flex flex-column flex-md-row justify-content-between pt-4 mt-4 border-top">
+                <p class="small text-muted">&copy; 2024-2025 Sec Era. All rights reserved.</p>
+                <ul class="list-unstyled d-flex">
+                    <li class="me-3"><a href="#" class="link-secondary small">Privacy</a></li>
+                    <li class="me-3"><a href="#" class="link-secondary small">Terms</a></li>
+                    <li><a href="#" class="link-secondary small">Cookies</a></li>
+                </ul>
             </div>
         </div>
     </footer>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <script>
-        // Error Handler
-        class ErrorHandler {
-            static init() {
-                window.addEventListener('error', this.handleError);
-                window.addEventListener('unhandledrejection', this.handlePromiseError);
-            }
-
-            static handleError(error) {
-                console.error('Error:', error);
-                this.showErrorMessage();
-            }
-
-            static handlePromiseError(event) {
-                console.error('Promise Error:', event.reason);
-                this.showErrorMessage();
-            }
-
-            static showErrorMessage() {
-                const errorContainer = document.createElement('div');
-                errorContainer.className = 'alert alert-danger alert-dismissible fade show';
-                errorContainer.innerHTML = `
-                    <strong>Oops!</strong> Something went wrong. Please try again later.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                `;
-                document.querySelector('.alert-container').appendChild(errorContainer);
-            }
-        }
-
-        // Performance Monitor
-        const performanceMonitor = {
-            init() {
-                this.measurePageLoad();
-                this.measureNetworkRequests();
-            },
-
-            measurePageLoad() {
-                window.addEventListener('load', () => {
-                    const timing = performance.timing;
-                    const pageLoadTime = timing.loadEventEnd - timing.navigationStart;
-                    console.log(`Page Load Time: ${pageLoadTime}ms`);
-                });
-            },
-
-            measureNetworkRequests() {
-                const observer = new PerformanceObserver((list) => {
-                    list.getEntries().forEach(entry => {
-                        console.log(`Resource Load Time: ${entry.name} - ${entry.duration}ms`);
-                    });
-                });
-                observer.observe({ entryTypes: ['resource'] });
-            }
-        };
-
-        // Initialize
-        $(document).ready(function() {
-            // Auto-hide flash messages
-            setTimeout(function() {
-                $('.alert').fadeOut('slow');
-            }, 5000);
-
-            // Loading state handling
-            $(document).on({
-                ajaxStart: function() { $('#loading-spinner').show(); },
-                ajaxStop: function() { $('#loading-spinner').hide(); }
-            });
-
-            // Theme switcher
-            $('#themeSwitcher').click(function() {
-                $('body').toggleClass('dark-theme');
-                localStorage.setItem('theme', 
-                    $('body').hasClass('dark-theme') ? 'dark' : 'light'
-                );
-            });
-
-            // Check saved theme
-            if (localStorage.getItem('theme') === 'dark') {
-                $('body').addClass('dark-theme');
-            }
-
-            // Initialize error handler and performance monitor
-            ErrorHandler.init();
-            performanceMonitor.init();
-        });
-
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => console.log('ServiceWorker registered'))
-                    .catch(err => console.log('ServiceWorker registration failed:', err));
-            });
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js" defer></script>
 
     {% block extra_js %}{% endblock %}
 </body>
 </html>
-

@@ -1,0 +1,264 @@
+/* Registration Page Styles */
+
+.register-bg {
+    background: linear-gradient(120deg, #e3f0ff 0%, #f8fafc 100%);
+    min-height: 100vh;
+}
+
+.register-card {
+    border-radius: 1.5rem;
+    overflow: hidden;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(13,110,253,0.10);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(90deg, #0d6efd 60%, #3b82f6 100%) !important;
+}
+
+/* --- Improved for register.html alignment --- */
+
+/* Section headers for user types */
+.section-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    background: #f1f3f5;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-left: 4px solid #0d6efd;
+}
+
+/* Role fields animation and spacing */
+.role-fields {
+    animation: fadeIn 0.3s ease-in-out;
+    margin-bottom: 1.5rem;
+    background: #f8fafc;
+    border-radius: 0.75rem;
+    padding: 1rem 1rem 0.5rem 1rem;
+    box-shadow: 0 2px 8px rgba(13,110,253,0.04);
+}
+body.dark-theme .role-fields {
+    background: #23272b;
+    box-shadow: 0 2px 8px rgba(13,110,253,0.10);
+}
+
+/* Form floating label fix for textarea */
+.form-floating textarea.form-control {
+    min-height: 80px;
+    height: 80px;
+    resize: vertical;
+}
+
+/* Error message styling */
+.text-danger.small {
+    font-size: 0.92em;
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+    display: block;
+}
+
+/* Responsive tweaks for register form */
+@media (max-width: 991px) {
+    .register-card {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+    .section-header {
+        font-size: 1rem;
+        padding: 0.5rem 0.5rem;
+    }
+    .role-fields {
+        padding: 0.7rem 0.5rem 0.3rem 0.5rem;
+    }
+}
+
+/* Progress bar for registration steps */
+.progress.register-progress {
+    background: #e9ecef;
+    border-radius: 1rem;
+    height: 6px;
+}
+.progress-bar {
+    transition: width 0.3s cubic-bezier(.4,0,.2,1);
+    border-radius: 1rem;
+    background: #0d6efd;
+}
+body.dark-theme .progress-bar {
+    background: #0d6efd;
+}
+
+/* Password strength bar */
+.password-strength .progress {
+    background: #e9ecef;
+    border-radius: 1rem;
+}
+.password-strength .progress-bar {
+    border-radius: 1rem;
+}
+
+/* Button improvements */
+.btn-primary {
+    padding: 0.8rem;
+    font-weight: 500;
+    border-radius: 2rem;
+    box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover, .btn-primary:focus {
+    background: #2563eb;
+    box-shadow: 0 4px 16px rgba(13,110,253,0.13);
+}
+
+/* Card header for register */
+.card-header {
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+    background: linear-gradient(90deg, #0d6efd 60%, #3b82f6 100%) !important;
+}
+body.dark-theme .card-header,
+body.dark-theme .bg-gradient-primary {
+    background: linear-gradient(90deg, #23272b 60%, #0d6efd 100%) !important;
+    color: #e9ecef;
+}
+
+/* Floating label color fix for dark mode */
+body.dark-theme .form-floating > label {
+    color: #b0b8c1;
+}
+
+/* Existing styles continue... */
+.register-card {
+    border-radius: 1.5rem;
+    overflow: hidden;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(13,110,253,0.10);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(90deg, #0d6efd 60%, #3b82f6 100%) !important;
+}
+
+.section-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    background: #f1f3f5;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-floating > label {
+    padding: 1rem 0.75rem;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.15rem rgba(13,110,253,0.15);
+}
+
+.progress.register-progress {
+    background: #e9ecef;
+    border-radius: 1rem;
+    height: 6px;
+}
+.progress-bar {
+    transition: width 0.3s cubic-bezier(.4,0,.2,1);
+    border-radius: 1rem;
+}
+
+.password-strength .progress {
+    background: #e9ecef;
+    border-radius: 1rem;
+}
+.password-strength .progress-bar {
+    border-radius: 1rem;
+}
+
+.btn-primary {
+    padding: 0.8rem;
+    font-weight: 500;
+    border-radius: 2rem;
+    box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover, .btn-primary:focus {
+    background: #2563eb;
+    box-shadow: 0 4px 16px rgba(13,110,253,0.13);
+}
+
+.role-fields {
+    animation: fadeIn 0.3s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card-header {
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+    background: linear-gradient(90deg, #0d6efd 60%, #3b82f6 100%) !important;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .register-card {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+    .section-header {
+        font-size: 1rem;
+        padding: 0.5rem 0.5rem;
+    }
+}
+
+/* Dark Theme */
+body.dark-theme .register-bg {
+    background: linear-gradient(120deg, #181a1b 0%, #23272b 100%);
+}
+body.dark-theme .register-card {
+    background: #23272b;
+    color: #e9ecef;
+    box-shadow: 0 8px 32px rgba(13,110,253,0.18);
+}
+body.dark-theme .card-header,
+body.dark-theme .bg-gradient-primary {
+    background: linear-gradient(90deg, #23272b 60%, #0d6efd 100%) !important;
+    color: #e9ecef;
+}
+body.dark-theme .form-control {
+    background: #181a1b;
+    color: #e9ecef;
+    border-color: #343a40;
+}
+body.dark-theme .form-control:focus {
+    border-color: #0d6efd;
+    background: #23272b;
+}
+body.dark-theme .section-header {
+    background: #181a1b;
+    color: #e9ecef;
+}
+body.dark-theme .progress.register-progress,
+body.dark-theme .password-strength .progress {
+    background: #343a40;
+}
+body.dark-theme .progress-bar {
+    background: #0d6efd;
+}
+body.dark-theme .btn-primary {
+    background: #0d6efd;
+    color: #fff;
+}
+body.dark-theme .btn-primary:hover, body.dark-theme .btn-primary:focus {
+    background: #2563eb;
+}

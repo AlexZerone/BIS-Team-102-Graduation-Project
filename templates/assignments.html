@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 
+
 {% block content %}
 <div class="container">
     <div class="row mt-4">
         <div class="col-md-12">
             <h2>Assignments</h2>
             {% if user_type == 'instructor' %}
-                <a href="#" class="btn btn-primary mb-3">Create New Assignment</a>
+                <a href="{{ url_for('assignments.create_assessment') }}" class="btn btn-primary mb-3">Create New Assignment</a>
             {% endif %}
             <div class="row">
                 {% if assignments %}
@@ -17,7 +18,20 @@
                                     <h5 class="card-title">{{ assignment.Title }}</h5>
                                     <p class="card-text">{{ assignment.Description }}</p>
                                     <p><strong>Due Date:</strong> {{ assignment.DueDate }}</p>
-                                    <a href="#" class="btn btn-primary">View Details</a>
+                                    {% if user_type == 'student' %}
+                                        <p>
+                                            <strong>Course:</strong> {{ assignment.CourseTitle }}<br>
+                                            <strong>Status:</strong> {{ assignment.SubmissionStatus or 'Not Submitted' }}<br>
+                                            <strong>Score:</strong> {{ assignment.Score or 'N/A' }}
+                                        </p>
+                                        <a href="{{ url_for('assignments.assessment_detail', AssessID=assignment.AssessID) }}" class="btn btn-primary">View Details</a>
+                                    {% elif user_type == 'instructor' %}
+                                        <p>
+                                            <strong>Course:</strong> {{ assignment.CourseTitle }}<br>
+                                            <strong>Submissions:</strong> {{ assignment.SubmissionCount or 0 }}
+                                        </p>
+                                        <a href="{{ url_for('assignments.assessment_detail', AssessID=assignment.AssessID) }}" class="btn btn-primary">View Details</a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

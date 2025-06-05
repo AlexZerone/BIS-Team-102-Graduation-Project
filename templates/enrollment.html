@@ -13,15 +13,14 @@
                                 <div class="card-body">
                                     <h5 class="card-title">{{ course.Title }}</h5>
                                     <p class="card-text">{{ course.Description }}</p>
-                                    <p><strong>Instructor:</strong> {{ course.Instructor }}</p>
-                                    {% if course.Enrolled %}
-                                        <button class="btn btn-secondary" disabled>Enrolled</button>
-                                    {% else %}
-                                        <form method="POST" action="{{ url_for('enrollments.enroll', course_id=course.CourseID) }}">
+                                    <p><strong>Instructor:</strong> {{ course.InstructorFirst }} {{ course.InstructorLast }}</p>
+                                    <form method="POST" action="{{ url_for('enrollments.enrollment') }}">
+                                        <input type="hidden" name="course_id" value="{{ course.CourseID }}">
+                                        {% if csrf_token %}
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                            <button type="submit" class="btn btn-primary">Enroll</button>
-                                        </form>
-                                    {% endif %}
+                                        {% endif %}
+                                        <button type="submit" class="btn btn-primary">Enroll</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

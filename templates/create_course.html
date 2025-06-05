@@ -1,50 +1,69 @@
-{% block title %}Create New Course{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}Create Course{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Create New Course</h2>
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            {% endfor %}
+<h2>Create a New Course</h2>
+
+<!-- Flash messages for feedback -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class="flashes">
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<form method="POST" action="{{ url_for('courses.create_course') }}">
+    {{ form.hidden_tag() }}  <!-- CSRF token and hidden fields -->
+
+    <div>
+        {{ form.title.label }}<br>
+        {{ form.title(class_='form-control', size=50) }}
+        {% if form.title.errors %}
+            <span class="error">{{ form.title.errors[0] }}</span>
         {% endif %}
-    {% endwith %}
+    </div>
+    <br>
 
-    <form method="POST" action="{{ url_for('courses.create_course') }}">
-        <div class="form-group">
-            <label for="title">Course Title *</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="Enter course title" required>
-        </div>
+    <div>
+        {{ form.description.label }}<br>
+        {{ form.description(class_='form-control', rows=4, cols=50) }}
+        {% if form.description.errors %}
+            <span class="error">{{ form.description.errors[0] }}</span>
+        {% endif %}
+    </div>
+    <br>
 
-        <div class="form-group">
-            <label for="description">Course Description</label>
-            <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter course description"></textarea>
-        </div>
+    <div>
+        {{ form.start_date.label }}<br>
+        {{ form.start_date(class_='form-control') }}
+        {% if form.start_date.errors %}
+            <span class="error">{{ form.start_date.errors[0] }}</span>
+        {% endif %}
+    </div>
+    <br>
 
-        <div class="form-group">
-            <label for="start_date">Start Date *</label>
-            <input type="date" class="form-control" id="start_date" name="start_date" required>
-        </div>
+    <div>
+        {{ form.end_date.label }}<br>
+        {{ form.end_date(class_='form-control') }}
+        {% if form.end_date.errors %}
+            <span class="error">{{ form.end_date.errors[0] }}</span>
+        {% endif %}
+    </div>
+    <br>
 
-        <div class="form-group">
-            <label for="end_date">End Date *</label>
-            <input type="date" class="form-control" id="end_date" name="end_date" required>
-        </div>
+    <div>
+        {{ form.duration.label }}<br>
+        {{ form.duration(class_='form-control', size=20) }}
+        {% if form.duration.errors %}
+            <span class="error">{{ form.duration.errors[0] }}</span>
+        {% endif %}
+    </div>
+    <br>
 
-        <div class="form-group">
-            <label for="duration">Duration (weeks)</label>
-            <input type="number" class="form-control" id="duration" name="duration" placeholder="e.g., 8" min="1">
-        </div>
-
-        <button type="submit" class="btn btn-primary">Create Course</button>
-        <a href="{{ url_for('courses.courses') }}" class="btn btn-secondary">Cancel</a>
-    </form>
-</div>
+    <button type="submit" class="btn btn-primary">Create Course</button>
+</form>
 {% endblock %}

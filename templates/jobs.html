@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <h2>Job Listings</h2>
             {% if user_type == 'company' %}
-                <a href="#" class="btn btn-primary mb-3">Post New Job</a>
+                <a href="{{ url_for('jobs.manage_jobs') }}" class="btn btn-primary mb-3">Post New Job</a>
             {% endif %}
             <div class="row">
                 {% if jobs %}
@@ -15,9 +15,20 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ job.Title }}</h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">{{ job.Company }}</h6>
+                                    <h6 class="card-subtitle mb-2 text-muted">
+                                        {% if job.CompanyName %}
+                                            {{ job.CompanyName }}
+                                        {% elif job.Company %}
+                                            {{ job.Company }}
+                                        {% endif %}
+                                    </h6>
                                     <p class="card-text">{{ job.Description }}</p>
-                                    <a href="#" class="btn btn-primary">View Details</a>
+                                    <a href="{{ url_for('jobs.job_detail', job_id=job.JobID) }}" class="btn btn-primary">View Details</a>
+                                    {% if user_type == 'company' %}
+                                        <span class="badge bg-info float-end mt-2">Applications: {{ job.ApplicationCount|default(0) }}</span>
+                                    {% elif user_type == 'student' and job.ApplicationStatus %}
+                                        <span class="badge bg-secondary float-end mt-2">{{ job.ApplicationStatus }}</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

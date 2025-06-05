@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+{% block title %}Register | Sec Era{% endblock %}
+{% block extra_css %}
+<link href="{{ url_for('static', filename='css/register.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="register-bg py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
+                <div class="card shadow-lg border-0 register-card">
+                    <div class="card-header bg-gradient-primary text-white text-center">
+                        <h3 class="mb-0">Create Your Account</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST" class="needs-validation" novalidate autocomplete="off" id="signupForm">
+                            {{ form.csrf_token }}
+                            <!-- Progress Indicator -->
+                            <div class="progress mb-4 register-progress" style="height: 6px;">
+                                <div class="progress-bar" role="progressbar" style="width: 0%;" id="formProgress"></div>
+                            </div>
+                            <!-- Basic Information -->
+                            <div class="section-header mb-3">
+                                <i class="fas fa-user-circle me-2 text-primary"></i> Basic Information
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        {{ form.first_name(class="form-control", id="first_name", placeholder="First Name", required=true) }}
+                                        <label for="first_name">{{ form.first_name.label.text }}</label>
+                                        {% for error in form.first_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        {{ form.last_name(class="form-control", id="last_name", placeholder="Last Name", required=true) }}
+                                        <label for="last_name">{{ form.last_name.label.text }}</label>
+                                        {% for error in form.last_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-floating mb-3">
+                                {{ form.email(class="form-control", id="email", placeholder="Email", required=true, autocomplete="off") }}
+                                <label for="email">{{ form.email.label.text }}</label>
+                                <div class="invalid-feedback">Please enter a valid email address.</div>
+                                {% for error in form.email.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="form-floating mb-3">
+                                {{ form.password(class="form-control", id="password", placeholder="Password", required=true, autocomplete="off") }}
+                                <label for="password">{{ form.password.label.text }}</label>
+                                <div class="invalid-feedback">Password must be at least 6 characters long.</div>
+                                {% for error in form.password.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                            </div>
+                            <!-- Password Strength Indicator -->
+                                <div class="password-strength mt-2 mb-3" id="passwordStrength"></div>
+                            <div class="mb-3">
+                                <div class="password-strength" id="passwordStrength">
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar" role="progressbar" style="width: 0%;" id="strengthBar"></div>
+                                    </div>
+                                    <small class="text-muted">Password strength: <span id="strengthText">None</span></small>
+                                </div>
+                            </div>
+                            <!-- Role-specific Fields -->
+                            <div class="form-floating mb-4">
+                                <select class="form-control" name="user_type" id="user_type" required>
+                                    <option value="" disabled selected>Select User Type</option>
+                                    <option value="student">Student</option>
+                                    <option value="instructor">Instructor</option>
+                                    <option value="company">Company Representative</option>
+                                </select>
+                                <label for="user_type">User Type</label>
+                                {% for error in form.user_type.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                            </div>
+                            <!-- Student Fields -->
+                            <div id="student-fields" class="role-fields" style="display: none;">
+                                <div class="section-header mb-2"><i class="fas fa-user-graduate me-2 text-success"></i> Student Information
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ form.university(class="form-control", id="university", placeholder="University") }}
+                                            <label for="university">{{ form.university.label.text }}</label>
+                                            {% for error in form.university.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ form.major(class="form-control", id="major", placeholder="Major") }}
+                                            <label for="major">{{ form.major.label.text }}</label>
+                                            {% for error in form.major.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ form.gpa(class="form-control", id="gpa", placeholder="GPA", type="number", step="0.01", min="0", max="4", autocomplete="off") }}
+                                            <label for="gpa">{{ form.gpa.label.text }}</label>
+                                            {% for error in form.gpa.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ form.expected_graduation_date(class="form-control", id="expected_graduation_date", type="date", autocomplete="off") }}
+                                            <label for="expected_graduation_date">{{ form.expected_graduation_date.label.text }}</label>
+                                            {% for error in form.expected_graduation_date.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    {{ form.bio_student(class="form-control", id="bio_student", placeholder="Short Bio (optional)", style="height: 80px;") }}
+                                    <label for="bio_student">Short Bio (optional)</label>
+                                    {% for error in form.bio_student.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                </div>
+                                <div class="form-floating mb-3">
+                                    {{ form.resume_file(class="form-control", id="resume_file", placeholder="Resume File (optional)") }}
+                                    <label for="resume_file">Resume File (optional)</label>
+                                    {% for error in form.resume_file.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                </div>
+                            </div>
+                            <!-- Instructor Fields -->
+                            <div id="instructor-fields" class="role-fields" style="display: none;">
+                                <div class="section-header mb-2"><i class="fas fa-chalkboard-teacher me-2 text-info"></i> Instructor Information
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ form.department(class="form-control", id="department", placeholder="Department") }}
+                                            <label for="department">{{ form.department.label.text }}</label>
+                                            {% for error in form.department.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ form.specialization(class="form-control", id="specialization", placeholder="Specialization") }}
+                                            <label for="specialization">{{ form.specialization.label.text }}</label>
+                                            {% for error in form.specialization.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    {{ form.experience(class="form-control", id="experience", type="number", min="0", placeholder="Years of Experience", autocomplete="off") }}
+                                    <label for="experience">{{ form.experience.label.text }}</label>
+                                    {% for error in form.experience.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                </div>
+                                <div class="form-floating mb-3">
+                                    {{ form.bio_instructor(class="form-control", id="bio_instructor", placeholder="Short Bio (optional)", style="height: 80px;") }}
+                                    <label for="bio_instructor">Short Bio (optional)</label>
+                                    {% for error in form.bio_instructor.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                </div>
+                            </div>
+                            <!-- Company Fields -->
+                            <div id="company-fields" class="role-fields" style="display: none;">
+                                <div class="section-header mb-2"><i class="fas fa-building me-2 text-warning"></i> Company Information
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ form.company_name(class="form-control", id="company_name", placeholder="Company Name") }}
+                                            <label for="company_name">{{ form.company_name.label.text }}</label>
+                                            {% for error in form.company_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ form.industry(class="form-control", id="industry", placeholder="Industry") }}
+                                            <label for="industry">{{ form.industry.label.text }}</label>
+                                            {% for error in form.industry.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ form.location(class="form-control", id="location", placeholder="Location") }}
+                                            <label for="location">{{ form.location.label.text }}</label>
+                                            {% for error in form.location.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ form.company_size(class="form-control", id="company_size", type="number", min="1", placeholder="Company Size") }}
+                                            <label for="company_size">{{ form.company_size.label.text }}</label>
+                                            {% for error in form.company_size.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            {{ form.founded_date(class="form-control", id="founded_date", type="date", autocomplete="off") }}
+                                            <label for="founded_date">{{ form.founded_date.label.text }}</label>
+                                            {% for error in form.founded_date.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    {{ form.bio_company(class="form-control", id="bio_company", placeholder="Short Bio (optional)", style="height: 80px;") }}
+                                    <label for="bio_company">Short Bio (optional)</label>
+                                    {% for error in form.bio_company.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                </div>
+                            </div>
+                            <div class="d-grid mt-4">
+                                {{ form.submit(class="btn btn-primary btn-lg") }}
+                            </div>
+                            <div class="text-center mt-3">
+                                <small>Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Password strength
+    const passwordInput = document.getElementById('password');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            let strength = 0;
+            const password = passwordInput.value;
+            
+            if (password.length >= 8) strength += 25;
+            if (password.match(/[a-z]+/)) strength += 25;
+            if (password.match(/[A-Z]+/)) strength += 25;
+            if (password.match(/[0-9]+/)) strength += 25;
+            
+            strengthBar.style.width = strength + '%';
+            
+            if (strength < 25) {
+                strengthBar.className = 'progress-bar bg-danger';
+                strengthText.textContent = 'Weak';
+            } else if (strength < 50) {
+                strengthBar.className = 'progress-bar bg-warning';
+                strengthText.textContent = 'Fair';
+            } else if (strength < 75) {
+                strengthBar.className = 'progress-bar bg-info';
+                strengthText.textContent = 'Good';
+            } else {
+                strengthBar.className = 'progress-bar bg-success';
+                strengthText.textContent = 'Strong';
+            }
+        });
+    }
+    
+    // Show/hide fields based on user type selection
+    const userTypeSelect = document.getElementById('user_type');
+    const studentFields = document.getElementById('student-fields');
+    const instructorFields = document.getElementById('instructor-fields');
+    const companyFields = document.getElementById('company-fields');
+    
+    if (userTypeSelect) {
+        userTypeSelect.addEventListener('change', function() {
+            console.log("User type changed to: " + this.value); // Debug log
+            
+            // Hide all fields first
+            if (studentFields) studentFields.style.display = 'none';
+            if (instructorFields) instructorFields.style.display = 'none';
+            if (companyFields) companyFields.style.display = 'none';
+            
+            // Show relevant fields based on selection
+            switch(this.value) {
+                case 'student':
+                    if (studentFields) studentFields.style.display = 'block';
+                    break;
+                case 'instructor':
+                    if (instructorFields) instructorFields.style.display = 'block';
+                    break;
+                case 'company':
+                    if (companyFields) companyFields.style.display = 'block';
+                    break;
+            }
+        });
+    }
+    
+    // Form validation
+    const signupForm = document.getElementById('signupForm');
+    if (signupForm) {
+        signupForm.addEventListener('submit', function(event) {
+            // Get the correct user_type element
+            const userType = document.getElementById('user_type').value;
+            let isValid = true;
+            
+            // Basic validation example
+            if (userType === 'student') {
+                const gpa = document.getElementById('gpa').value;
+                if (gpa && (gpa < 0 || gpa > 4)) {
+                    alert('GPA must be between 0 and 4');
+                    isValid = false;
+                }
+            }
+            
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    }
+    
+    // Update progress bar as user fills form
+    const formInputs = document.querySelectorAll('#signupForm input, #signupForm select, #signupForm textarea');
+    const progressBar = document.getElementById('formProgress');
+    
+    if (formInputs.length > 0 && progressBar) {
+        const updateProgress = function() {
+            const filledInputs = Array.from(formInputs).filter(input => 
+                (input.type === 'checkbox' || input.type === 'radio') ? input.checked : input.value.trim() !== ''
+            );
+            const progress = (filledInputs.length / formInputs.length) * 100;
+            progressBar.style.width = progress + '%';
+        };
+        
+        formInputs.forEach(input => {
+            input.addEventListener('input', updateProgress);
+            input.addEventListener('change', updateProgress);
+        });
+        
+        // Initial progress calculation
+        updateProgress();
+    }
+});
+</script>{% endblock %}
+
+{% endblock %}

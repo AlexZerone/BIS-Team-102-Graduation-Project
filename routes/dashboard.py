@@ -2,10 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, session, B
 from models import get_record, get_records, execute_query
 from permissions import login_required, role_required
 
-
-
 dashboard_bp = Blueprint('dashboard', __name__)
-
 
 @dashboard_bp.route('/dashboard')
 @login_required
@@ -33,5 +30,3 @@ def dashboard():
     except Exception as e:
         flash(f'Error loading dashboard: {str(e)}', 'danger')
         return redirect(url_for('home.home'))
-
-

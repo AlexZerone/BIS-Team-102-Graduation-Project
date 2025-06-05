@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+
 {% block title %}Assessment Details{% endblock %}
 
 {% block extra_css %}
@@ -40,9 +41,9 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Assessment Details</h5>
-                        <p><strong>Due Date:</strong> {{ assessment.DueDate.strftime('%Y-%m-%d') }}</p>
+                        <p><strong>Due Date:</strong> {{ assessment.DueDate.strftime('%Y-%m-%d') if assessment.DueDate else '' }}</p>
                         <p><strong>Max Score:</strong> {{ assessment.MaxScore }}</p>
-                        <p><strong>Weight:</strong> {{ assessment.Weight }}%</p>
+                        <p><strong>Weight:</strong> {{ (assessment.Weight * 100)|round|int }}%</p>
                     </div>
                 </div>
             </div>
@@ -73,12 +74,11 @@
                 {% else %}
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Submit Assessment</h5>
-                            <form action="{{ url_for('assessments.submit_assessment', assess_id=assessment.AssessID) }}" method="POST">
-                                {{ form.csrf_token }}
+                            <h5 class="card-title">Submit Assessment</h5>                            <form action="{{ url_for('assignments.submit_assessment', AssessID=assessment.AssessID) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <div class="mb-3">
                                     <label for="submission" class="form-label">Your Answer</label>
-                                    <textarea class="form-control" id="submission" name="submission" rows="6" required></textarea>
+                                    <textarea class="form-control" id="submission" name="content" rows="6" required></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </form>
@@ -106,11 +106,10 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {% for submission in submissions %}
+                        <tbody>                            {% for submission in submissions %}
                                 <tr>
                                     <td>{{ submission.First }} {{ submission.Last }}</td>
-                                    <td>{{ submission.SubmissionDate.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ submission.SubmissionDate.strftime('%Y-%m-%d') if submission.SubmissionDate else 'N/A' }}</td>
                                     <td>
                                         <span class="badge bg-{{ 'success' if submission.Status == 'Completed' else 'warning' }}">
                                             {{ submission.Status }}
@@ -118,10 +117,10 @@
                                     </td>
                                     <td>{{ submission.Score if submission.Score else 'Not graded' }}</td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary" 
-                                                onclick="viewSubmission({{ submission.StudentID }})">
-                                            View
-                                        </button>
+                                        <a href="{{ url_for('assignments.review_submission', AssessID=assessment.AssessID, StudentID=submission.StudentID) }}" 
+                                           class="btn btn-sm btn-primary">
+                                            Review
+                                        </a>
                                     </td>
                                 </tr>
                             {% endfor %}

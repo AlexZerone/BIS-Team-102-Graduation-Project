@@ -1,7 +1,5 @@
-# app.py
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
-
 from config import Config
 from extensions import mysql
 
@@ -13,41 +11,42 @@ from routes.enrollments import enrollments_bp
 from routes.jobs import jobs_bp
 from routes.assignments import assignments_bp
 from routes.profile import profile_bp
+from initialize_statuses import initialize_application_statuses
 
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
+    Config.init_app(app)
+    
+    # Set MySQL configuration
+    app.config['MYSQL_UNIX_SOCKET'] = None  # Use TCP instead of Unix socket
+    
+    # Initialize extensions
+    mysql.init_app(app)
+      # Initialize app extensions and data - after MySQL is connected
+    with app.app_context():
+        initialize_application_statuses()
+    
+    # Setup CSRF protection
+    csrf = CSRFProtect(app)
+      # Make csrf token available in all templates
+    @app.context_processor
+    def inject_csrf_token():
+        from flask_wtf.csrf import generate_csrf
+        return dict(csrf_token=generate_csrf)
 
+    # Register blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(home_bp, url_prefix="/")
+    app.register_blueprint(courses_bp)
+    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(enrollments_bp)
+    app.register_blueprint(jobs_bp)
+    app.register_blueprint(assignments_bp)
+    app.register_blueprint(profile_bp, url_prefix='/profile')
 
-# Initialize Flask app
-app = Flask(__name__)
-app.config.from_object(Config)
-Config.init_app(app) # This will set paths that need app context
-
-# Initialize MySQL and CSRF protection
-mysql.init_app(app)  
-csrf = CSRFProtect(app)
-
-# Add to your Flask app
-'''
-@app.after_request
-def add_security_headers(response):
-    response.headers['Content-Security-Policy'] = "default-src 'self'"
-    response.headers['X-Content-Type-Options'] = 'nosniff'
-    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    response.headers['X-XSS-Protection'] = '1; mode=block'
-    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-    return response'''
-
-
-# Routes
-# Register Blueprints
-app.register_blueprint(auth_bp)
-app.register_blueprint(home_bp, url_prefix="/")
-app.register_blueprint(courses_bp)
-app.register_blueprint(dashboard_bp)
-app.register_blueprint(enrollments_bp)
-app.register_blueprint(jobs_bp)
-app.register_blueprint(assignments_bp)
-app.register_blueprint(profile_bp, url_prefix='/profile')
-
+    return app
 
 if __name__ == '__main__':
+    app = create_app()
     app.run(debug=True)
