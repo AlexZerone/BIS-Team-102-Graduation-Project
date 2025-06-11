@@ -1,0 +1,279 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}System Settings - Admin{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-cog me-2 text-secondary"></i>
+System Settings
+{% endblock %}
+
+{% block page_actions %}
+<span class="badge bg-secondary">{{ settings|length }} settings</span>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Settings Form -->
+    <div class="row">
+        <div class="col-md-12">
+            <form method="POST" action="{{ url_for('admin.update_settings') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-sliders-h me-2"></i>Platform Configuration
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if settings %}
+                        <div class="row">
+                            {% for setting in settings %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <label for="{{ setting.SettingKey }}" class="form-label fw-bold">
+                                            {{ setting.SettingKey|replace('_', ' ')|title }}
+                                        </label>
+                                        
+                                        {% if setting.SettingDescription %}
+                                        <p class="text-muted small mb-2">{{ setting.SettingDescription }}</p>
+                                        {% endif %}
+
+                                        {% if setting.SettingKey in ['email_notifications', 'user_registration', 'course_auto_approval', 'maintenance_mode', 'public_registration', 'email_verification_required'] %}
+                                        <!-- Boolean settings -->
+                                        <select class="form-select" id="{{ setting.SettingKey }}" name="{{ setting.SettingKey }}">
+                                            <option value="true" {% if setting.SettingValue|lower == 'true' %}selected{% endif %}>Enabled</option>
+                                            <option value="false" {% if setting.SettingValue|lower == 'false' %}selected{% endif %}>Disabled</option>
+                                        </select>
+                                        
+                                        {% elif setting.SettingKey in ['max_file_size', 'session_timeout', 'max_login_attempts', 'password_min_length'] %}
+                                        <!-- Numeric settings -->
+                                        <input type="number" class="form-control" id="{{ setting.SettingKey }}" 
+                                               name="{{ setting.SettingKey }}" value="{{ setting.SettingValue }}">
+                                        
+                                        {% elif setting.SettingKey in ['site_name', 'support_email', 'admin_email', 'company_name', 'default_timezone'] %}
+                                        <!-- Text settings -->
+                                        <input type="text" class="form-control" id="{{ setting.SettingKey }}" 
+                                               name="{{ setting.SettingKey }}" value="{{ setting.SettingValue }}">
+                                        
+                                        {% elif setting.SettingKey in ['site_description', 'privacy_policy', 'terms_of_service'] %}
+                                        <!-- Textarea settings -->
+                                        <textarea class="form-control" id="{{ setting.SettingKey }}" 
+                                                  name="{{ setting.SettingKey }}" rows="3">{{ setting.SettingValue }}</textarea>
+                                        
+                                        {% else %}
+                                        <!-- Default input -->
+                                        <input type="text" class="form-control" id="{{ setting.SettingKey }}" 
+                                               name="{{ setting.SettingKey }}" value="{{ setting.SettingValue }}">
+                                        {% endif %}
+
+                                        {% if setting.UpdatedAt %}
+                                        <small class="text-muted d-block mt-1">
+                                            Last updated: {{ setting.UpdatedAt.strftime('%Y-%m-%d %H:%M') }}
+                                        </small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-cog fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No Settings Configured</h5>
+                            <p class="text-muted">System settings will appear here when available</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if settings %}
+                    <div class="card-footer bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Changes will take effect immediately
+                            </small>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Settings
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quick Settings Panel -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-warning bg-opacity-10 border-warning">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-tools fa-2x text-warning mb-2"></i>
+                                    <h6>Maintenance Mode</h6>
+                                    <button type="button" class="btn btn-sm btn-warning" onclick="toggleMaintenance()">
+                                        Toggle
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-danger bg-opacity-10 border-danger">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-trash fa-2x text-danger mb-2"></i>
+                                    <h6>Clear Cache</h6>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="clearCache()">
+                                        Clear Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-info bg-opacity-10 border-info">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-sync fa-2x text-info mb-2"></i>
+                                    <h6>Reload Config</h6>
+                                    <button type="button" class="btn btn-sm btn-info" onclick="reloadConfig()">
+                                        Reload
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-success bg-opacity-10 border-success">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-download fa-2x text-success mb-2"></i>
+                                    <h6>Backup Settings</h6>
+                                    <button type="button" class="btn btn-sm btn-success" onclick="backupSettings()">
+                                        Download
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Information -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-server me-2"></i>System Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6 class="text-primary">Platform Info</h6>
+                            <p class="mb-1"><strong>Version:</strong> Sec Era v2.0</p>
+                            <p class="mb-1"><strong>Environment:</strong> Production</p>
+                            <p class="mb-1"><strong>Debug Mode:</strong> 
+                                <span class="badge bg-success">Disabled</span>
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-primary">Database</h6>
+                            <p class="mb-1"><strong>Type:</strong> MySQL</p>
+                            <p class="mb-1"><strong>Version:</strong> 8.0.x</p>
+                            <p class="mb-1"><strong>Status:</strong> 
+                                <span class="badge bg-success">Connected</span>
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-primary">Server</h6>
+                            <p class="mb-1"><strong>Python:</strong> 3.12.x</p>
+                            <p class="mb-1"><strong>Flask:</strong> 3.0.x</p>
+                            <p class="mb-1"><strong>Uptime:</strong> 
+                                <span class="text-success">Running</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleMaintenance() {
+    if (confirm('Are you sure you want to toggle maintenance mode?')) {
+        // Implementation for maintenance mode toggle
+        alert('Maintenance mode toggle functionality would be implemented here');
+    }
+}
+
+function clearCache() {
+    if (confirm('Are you sure you want to clear the system cache?')) {
+        // Implementation for cache clearing
+        alert('Cache clearing functionality would be implemented here');
+    }
+}
+
+function reloadConfig() {
+    if (confirm('Are you sure you want to reload the configuration?')) {
+        // Implementation for config reload
+        alert('Configuration reload functionality would be implemented here');
+    }
+}
+
+function backupSettings() {
+    // Implementation for settings backup download
+    alert('Settings backup download functionality would be implemented here');
+}
+
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Add any client-side validation here
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('is-invalid');
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

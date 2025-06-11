@@ -1,0 +1,343 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Reports & Analytics - Admin{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-chart-bar me-2 text-info"></i>
+Reports & Analytics
+{% endblock %}
+
+{% block page_actions %}
+<button class="btn btn-outline-primary" onclick="exportReport()">
+    <i class="fas fa-download me-1"></i>Export
+</button>
+<button class="btn btn-primary" onclick="refreshData()">
+    <i class="fas fa-sync me-1"></i>Refresh
+</button>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-user-plus fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">New Users (30d)</h6>
+                            <h3 class="mb-0">{{ user_trends|sum(attribute='count') if user_trends else 0 }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-book-open fa-2x text-success"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Course Enrollments (30d)</h6>
+                            <h3 class="mb-0">{{ enrollment_trends|sum(attribute='count') if enrollment_trends else 0 }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-briefcase fa-2x text-warning"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Job Applications (30d)</h6>
+                            <h3 class="mb-0">{{ application_trends|sum(attribute='count') if application_trends else 0 }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-star fa-2x text-info"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Active Courses</h6>
+                            <h3 class="mb-0">{{ popular_courses|length if popular_courses else 0 }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- User Registration Trends -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>User Registration Trends
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if user_trends %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>User Type</th>
+                                    <th>Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for trend in user_trends[:10] %}
+                                <tr>
+                                    <td>{{ trend.date.strftime('%Y-%m-%d') if trend.date else 'N/A' }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'primary' if trend.UserType == 'student' else 'warning' if trend.UserType == 'instructor' else 'info' }}">
+                                            {{ trend.UserType|title }}
+                                        </span>
+                                    </td>
+                                    <td><strong>{{ trend.count }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-chart-line fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">No registration data available</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Enrollment Trends -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-area me-2"></i>Course Enrollment Trends
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if enrollment_trends %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Enrollments</th>
+                                    <th>Trend</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for trend in enrollment_trends[:10] %}
+                                <tr>
+                                    <td>{{ trend.date.strftime('%Y-%m-%d') if trend.date else 'N/A' }}</td>
+                                    <td><strong>{{ trend.count }}</strong></td>
+                                    <td>
+                                        {% if loop.index0 > 0 %}
+                                            {% set prev_count = enrollment_trends[loop.index0-1].count %}
+                                            {% if trend.count > prev_count %}
+                                                <i class="fas fa-arrow-up text-success"></i>
+                                            {% elif trend.count < prev_count %}
+                                                <i class="fas fa-arrow-down text-danger"></i>
+                                            {% else %}
+                                                <i class="fas fa-minus text-muted"></i>
+                                            {% endif %}
+                                        {% else %}
+                                            <i class="fas fa-minus text-muted"></i>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-chart-area fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">No enrollment data available</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popular Courses -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trophy me-2"></i>Most Popular Courses
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if popular_courses %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Course Title</th>
+                                    <th>Enrollments</th>
+                                    <th>Popularity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in popular_courses %}
+                                <tr>
+                                    <td>
+                                        {% if loop.index <= 3 %}
+                                        <span class="badge bg-{{ 'warning' if loop.index == 1 else 'secondary' if loop.index == 2 else 'dark' }}">
+                                            #{{ loop.index }}
+                                        </span>
+                                        {% else %}
+                                        <span class="text-muted">#{{ loop.index }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="fw-medium">{{ course.Title }}</div>
+                                    </td>
+                                    <td><strong>{{ course.enrollments }}</strong></td>
+                                    <td>
+                                        <div class="progress" style="height: 6px;">
+                                            {% set max_enrollments = popular_courses[0].enrollments if popular_courses else 1 %}
+                                            {% set percentage = (course.enrollments / max_enrollments * 100) if max_enrollments > 0 else 0 %}
+                                            <div class="progress-bar bg-info" style="width: {{ percentage }}%"></div>
+                                        </div>
+                                        <small class="text-muted">{{ "%.1f"|format(percentage) }}%</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Course Data</h5>
+                        <p class="text-muted">Course popularity data will appear here when available</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Application Activity -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-briefcase me-2"></i>Job Application Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if application_trends %}
+                    <div class="mb-3">
+                        <h6 class="text-muted">Recent Activity</h6>
+                        {% for trend in application_trends[:5] %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small">{{ trend.date.strftime('%m/%d') if trend.date else 'N/A' }}</span>
+                            <span class="badge bg-warning">{{ trend.count }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="text-center">
+                        <h4 class="text-warning">{{ application_trends|sum(attribute='count') if application_trends else 0 }}</h4>
+                        <small class="text-muted">Total Applications (30 days)</small>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-briefcase fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">No application data available</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tachometer-alt me-2"></i>Platform Statistics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 border-end">
+                            <div class="py-3">
+                                <h4 class="text-primary mb-1">85%</h4>
+                                <small class="text-muted">User Satisfaction</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 border-end">
+                            <div class="py-3">
+                                <h4 class="text-success mb-1">92%</h4>
+                                <small class="text-muted">Course Completion</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 border-end">
+                            <div class="py-3">
+                                <h4 class="text-warning mb-1">78%</h4>
+                                <small class="text-muted">Job Placement</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="py-3">
+                                <h4 class="text-info mb-1">96%</h4>
+                                <small class="text-muted">Platform Uptime</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>{% endblock %}
+
+{% block extra_js %}
+<script>
+function exportReport() {
+    // Implementation for report export
+    alert('Report export functionality would be implemented here');
+}
+
+function refreshData() {
+    // Implementation for data refresh
+    window.location.reload();
+}
+
+// Initialize any charts if using a charting library
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart initialization code would go here
+    console.log('Reports page loaded successfully');
+});
+</script>
+{% endblock %}

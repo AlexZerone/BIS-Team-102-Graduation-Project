@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+
+{% block title %}My Subscription - Sec Era{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-credit-card me-2" style="color: #223947;"></i>
+                    My Subscription
+                </h1>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('subscriptions.plans') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-eye me-1"></i>View All Plans
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Plan Details -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header" style="background-color: #223947; color: white;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-star me-2"></i>Current Plan Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 class="text-primary fw-bold">{{ student.PlanName or 'Freemium' }}</h4>
+                            <p class="text-muted mb-3">{{ student.Description or 'Basic access to platform features' }}</p>
+                            
+                            <div class="mb-3">
+                                <strong>Price:</strong>
+                                {% if student.Price == 0 or not student.Price %}
+                                <span class="badge bg-success">FREE</span>
+                                {% else %}
+                                <span class="fw-bold">${{ "%.2f"|format(student.Price) }}</span>
+                                <span class="text-muted">
+                                    /{% if student.BillingCycle == 'monthly' %}month{% else %}year{% endif %}
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Status:</strong>
+                                {% if student.SubscriptionStatus == 'active' %}
+                                <span class="badge bg-success">Active</span>
+                                {% elif student.SubscriptionStatus == 'cancelled' %}
+                                <span class="badge bg-warning">Cancelled</span>
+                                {% elif student.SubscriptionStatus == 'expired' %}
+                                <span class="badge bg-danger">Expired</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Free</span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if student.SubscriptionStart %}
+                            <div class="mb-3">
+                                <strong>Started:</strong> {{ student.SubscriptionStart.strftime('%B %d, %Y') }}
+                            </div>
+                            {% endif %}
+                            
+                            {% if student.SubscriptionEnd %}
+                            <div class="mb-3">
+                                <strong>
+                                    {% if student.SubscriptionStatus == 'cancelled' %}Expires:{% else %}Next Billing:{% endif %}
+                                </strong>
+                                {{ student.SubscriptionEnd.strftime('%B %d, %Y') }}
+                                {% if student.SubscriptionEnd > moment().date() %}
+                                <small class="text-muted">
+                                    ({{ (student.SubscriptionEnd - moment().date()).days }} days remaining)
+                                </small>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {% if student.Features %}
+                            <h6 class="fw-bold mb-3">Plan Features:</h6>
+                            <ul class="list-unstyled">
+                                {% if student.Features.courses %}
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    {% if student.Features.courses == 'intro_only' %}
+                                    Introduction courses only
+                                    {% elif student.Features.courses == 'all_free' %}
+                                    All free courses
+                                    {% elif student.Features.courses == 'unlimited' %}
+                                    Unlimited course access
+                                    {% endif %}
+                                </li>
+                                {% endif %}
+                                
+                                {% if student.Features.certifications %}
+                                <li class="mb-2">
+                                    <i class="fas fa-certificate text-warning me-2"></i>
+                                    {{ student.Features.certifications|title }} certifications
+                                </li>
+                                {% endif %}
+                                
+                                {% if student.Features.live_sessions %}
+                                <li class="mb-2">
+                                    <i class="fas fa-video text-info me-2"></i>
+                                    Live sessions included
+                                </li>
+                                {% endif %}
+                                
+                                {% if student.Features.coaching %}
+                                <li class="mb-2">
+                                    <i class="fas fa-user-tie text-primary me-2"></i>
+                                    Personal coaching
+                                </li>
+                                {% endif %}
+                                
+                                {% if student.Features.support %}
+                                <li class="mb-2">
+                                    <i class="fas fa-headset text-secondary me-2"></i>
+                                    {{ student.Features.support|title }} support
+                                </li>
+                                {% endif %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2 mt-4">
+                        {% if student.SubscriptionTier != 'premium_annual' %}
+                        <a href="{{ url_for('subscriptions.upgrade', plan_name='premium_annual') }}" 
+                           class="btn btn-primary">
+                            <i class="fas fa-arrow-up me-1"></i>Upgrade Plan
+                        </a>
+                        {% endif %}
+                        
+                        {% if student.SubscriptionStatus == 'active' and student.SubscriptionTier != 'freemium' %}
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" 
+                                data-bs-target="#cancelModal">
+                            <i class="fas fa-times me-1"></i>Cancel Subscription
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Installment Information -->
+        <div class="col-md-4">
+            {% if installment_info and installment_info.total_installments > 1 %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>Installment Plan
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="progress mb-2" style="height: 20px;">
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                 style="width: {{ (installment_info.paid_installments / installment_info.total_installments * 100)|round }}%">
+                                {{ installment_info.paid_installments }}/{{ installment_info.total_installments }}
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            {{ installment_info.paid_installments }} of {{ installment_info.total_installments }} payments completed
+                        </small>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <strong>Next Payment:</strong>
+                        <span class="float-end">${{ "%.2f"|format(student.Price / 12) }}</span>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <strong>Remaining:</strong>
+                        <span class="float-end">
+                            ${{ "%.2f"|format((student.Price / 12) * (installment_info.total_installments - installment_info.paid_installments)) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#paymentHistory" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-history me-1"></i>Payment History
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+                            <i class="fas fa-print me-1"></i>Print Details
+                        </a>
+                        <a href="{{ url_for('help.contact') }}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-question-circle me-1"></i>Get Help
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment History -->
+    <div class="row" id="paymentHistory">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-receipt me-2"></i>Payment History
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if payment_history %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Plan</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Method</th>
+                                    <th>Invoice</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payment_history %}
+                                <tr>
+                                    <td>{{ payment.PaymentDate.strftime('%b %d, %Y') if payment.PaymentDate else 'Pending' }}</td>
+                                    <td>
+                                        <div class="fw-medium">{{ payment.PlanName }}</div>
+                                        {% if payment.IsInstallment %}
+                                        <small class="text-muted">
+                                            Installment {{ payment.InstallmentNumber }}/{{ payment.TotalInstallments }}
+                                        </small>
+                                        {% endif %}
+                                    </td>
+                                    <td><strong>${{ "%.2f"|format(payment.Amount) }}</strong></td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if payment.Status == 'completed' else 'warning' if payment.Status == 'pending' else 'danger' }}">
+                                            {{ payment.Status|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ payment.PaymentMethod|replace('_', ' ')|title if payment.PaymentMethod else 'N/A' }}</td>
+                                    <td>
+                                        {% if payment.Status == 'completed' %}
+                                        <a href="{{ url_for('subscriptions.invoice', payment_id=payment.PaymentID) }}" 
+                                           class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <i class="fas fa-file-pdf me-1"></i>View
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Payment History</h5>
+                        <p class="text-muted">Your payment transactions will appear here</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Subscription Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel Subscription</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('subscriptions.cancel_subscription') }}">
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Are you sure you want to cancel your subscription?</strong>
+                    </div>
+                    
+                    <p>Your subscription will remain active until {{ student.SubscriptionEnd.strftime('%B %d, %Y') if student.SubscriptionEnd else 'the end of your billing period' }}, 
+                       after which you'll be moved to our free plan.</p>
+                    
+                    <div class="mb-3">
+                        <label for="cancellationReason" class="form-label">
+                            Tell us why you're cancelling (optional)
+                        </label>
+                        <select class="form-select" name="cancellation_reason">
+                            <option value="">Select a reason...</option>
+                            <option value="too_expensive">Too expensive</option>
+                            <option value="not_using">Not using enough</option>
+                            <option value="found_alternative">Found alternative</option>
+                            <option value="technical_issues">Technical issues</option>
+                            <option value="temporary">Temporary cancellation</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Subscription</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times me-1"></i>Cancel Subscription
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add smooth scrolling to payment history
+document.querySelector('a[href="#paymentHistory"]')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('paymentHistory').scrollIntoView({
+        behavior: 'smooth'
+    });
+});
+</script>
+{% endblock %}

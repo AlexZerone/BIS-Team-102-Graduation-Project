@@ -1,0 +1,479 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Contact Requests - Admin{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-inbox me-2" style="color: #223947;"></i>
+Contact Requests Management
+{% endblock %}
+
+{% block page_actions %}
+<button class="btn btn-outline-primary" onclick="refreshRequests()">
+    <i class="fas fa-refresh me-1"></i>Refresh
+</button>
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" 
+            data-bs-toggle="dropdown">
+        <i class="fas fa-filter me-1"></i>Filter
+    </button>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="?status=open">Open Requests</a></li>
+        <li><a class="dropdown-item" href="?status=in_progress">In Progress</a></li>
+        <li><a class="dropdown-item" href="?status=resolved">Resolved</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="?priority=high">High Priority</a></li>
+        <li><a class="dropdown-item" href="?priority=critical">Critical</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-envelope-open fa-2x text-warning"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Open Requests</h6>
+                            <h3 class="mb-0">{{ stats.open_requests|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-clock fa-2x text-info"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">In Progress</h6>
+                            <h3 class="mb-0">{{ stats.in_progress|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-check-circle fa-2x text-success"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Resolved Today</h6>
+                            <h3 class="mb-0">{{ stats.resolved_today|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Critical Issues</h6>
+                            <h3 class="mb-0">{{ stats.critical_requests|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Requests Table -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header" style="background-color: #223947; color: white;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Contact Requests
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if requests %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%">
+                                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                    </th>
+                                    <th width="15%">Contact Info</th>
+                                    <th width="20%">Subject</th>
+                                    <th width="10%">Category</th>
+                                    <th width="8%">Priority</th>
+                                    <th width="10%">Status</th>
+                                    <th width="10%">Created</th>
+                                    <th width="10%">Assigned To</th>
+                                    <th width="12%">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in requests %}
+                                <tr class="request-row" data-request-id="{{ request.RequestID }}">
+                                    <td>
+                                        <input type="checkbox" class="request-checkbox" value="{{ request.RequestID }}">
+                                    </td>
+                                    <td>
+                                        <div class="fw-medium">{{ request.Name }}</div>
+                                        <small class="text-muted">{{ request.Email }}</small>
+                                        {% if request.UserID %}
+                                        <small class="badge bg-primary">Registered User</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="fw-medium">{{ request.Subject }}</div>
+                                        <small class="text-muted">{{ request.Message[:50] }}{% if request.Message|length > 50 %}...{% endif %}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'primary' if request.Category == 'technical' else 'success' if request.Category == 'billing' else 'info' if request.Category == 'course' else 'secondary' }}">
+                                            {{ request.Category|title }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'danger' if request.Priority == 'critical' else 'warning' if request.Priority == 'high' else 'primary' if request.Priority == 'normal' else 'secondary' }}">
+                                            {{ request.Priority|title }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'warning' if request.Status == 'open' else 'info' if request.Status == 'in_progress' else 'success' if request.Status == 'resolved' else 'secondary' }}">
+                                            {{ request.Status.replace('_', ' ')|title }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small>{{ request.CreatedAt.strftime('%Y-%m-%d %H:%M') if request.CreatedAt else 'N/A' }}</small>
+                                    </td>
+                                    <td>
+                                        {% if request.AssignedToName %}
+                                        <small class="text-muted">{{ request.AssignedToName }}</small>
+                                        {% else %}
+                                        <small class="text-muted">Unassigned</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                                    type="button" data-bs-toggle="dropdown">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" 
+                                                       data-bs-target="#viewRequestModal{{ request.RequestID }}">
+                                                        <i class="fas fa-eye me-2"></i>View Details
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" 
+                                                       data-bs-target="#respondModal{{ request.RequestID }}">
+                                                        <i class="fas fa-reply me-2"></i>Respond
+                                                    </a>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" onclick="assignRequest({{ request.RequestID }})">
+                                                        <i class="fas fa-user-tag me-2"></i>Assign
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" onclick="updateStatus({{ request.RequestID }}, 'resolved')">
+                                                        <i class="fas fa-check me-2"></i>Mark Resolved
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Bulk Actions -->
+                    <div class="p-3 bg-light border-top d-none" id="bulkActions">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="bulkAssign()">
+                                <i class="fas fa-user-tag me-1"></i>Bulk Assign
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="bulkUpdateStatus('resolved')">
+                                <i class="fas fa-check me-1"></i>Mark as Resolved
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="exportSelected()">
+                                <i class="fas fa-download me-1"></i>Export
+                            </button>
+                        </div>
+                    </div>
+
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Contact Requests</h5>
+                        <p class="text-muted">Contact requests will appear here when users submit them</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Request Modals -->
+{% for request in requests %}
+<div class="modal fade" id="viewRequestModal{{ request.RequestID }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request Details - #{{ request.RequestID }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">Contact Information</h6>
+                        <p class="mb-1"><strong>Name:</strong> {{ request.Name }}</p>
+                        <p class="mb-1"><strong>Email:</strong> {{ request.Email }}</p>
+                        <p class="mb-3"><strong>User Type:</strong> 
+                            {% if request.UserID %}Registered User (ID: {{ request.UserID }}){% else %}Guest{% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">Request Details</h6>
+                        <p class="mb-1"><strong>Category:</strong> {{ request.Category|title }}</p>
+                        <p class="mb-1"><strong>Priority:</strong> {{ request.Priority|title }}</p>
+                        <p class="mb-1"><strong>Status:</strong> {{ request.Status.replace('_', ' ')|title }}</p>
+                        <p class="mb-3"><strong>Created:</strong> {{ request.CreatedAt.strftime('%Y-%m-%d %H:%M:%S') if request.CreatedAt else 'N/A' }}</p>
+                    </div>
+                </div>
+                
+                <h6 class="fw-bold">Subject</h6>
+                <p class="mb-3">{{ request.Subject }}</p>
+                
+                <h6 class="fw-bold">Message</h6>
+                <div class="p-3 bg-light rounded">
+                    <p class="mb-0" style="white-space: pre-wrap;">{{ request.Message }}</p>
+                </div>
+                
+                {% if request.AdminResponse %}
+                <h6 class="fw-bold mt-3">Admin Response</h6>
+                <div class="p-3 bg-primary bg-opacity-10 rounded">
+                    <p class="mb-0" style="white-space: pre-wrap;">{{ request.AdminResponse }}</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
+                        data-bs-target="#respondModal{{ request.RequestID }}">
+                    <i class="fas fa-reply me-1"></i>Respond
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Respond Modal -->
+<div class="modal fade" id="respondModal{{ request.RequestID }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Respond to Request #{{ request.RequestID }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.respond_contact_request') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="request_id" value="{{ request.RequestID }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Original Subject</label>
+                        <p class="form-control-plaintext">{{ request.Subject }}</p>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="status{{ request.RequestID }}" class="form-label fw-bold">Status</label>
+                                <select class="form-select" name="status" id="status{{ request.RequestID }}">
+                                    <option value="open" {% if request.Status == 'open' %}selected{% endif %}>Open</option>
+                                    <option value="in_progress" {% if request.Status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="resolved" {% if request.Status == 'resolved' %}selected{% endif %}>Resolved</option>
+                                    <option value="closed" {% if request.Status == 'closed' %}selected{% endif %}>Closed</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="assignTo{{ request.RequestID }}" class="form-label fw-bold">Assign To</label>
+                                <select class="form-select" name="assign_to">
+                                    <option value="">Unassigned</option>
+                                    {% for admin in admin_users %}
+                                    <option value="{{ admin.UserID }}" {% if admin.UserID == request.AssignedTo %}selected{% endif %}>
+                                        {{ admin.First }} {{ admin.Last }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="response{{ request.RequestID }}" class="form-label fw-bold">Response Message</label>
+                        <textarea class="form-control" name="response" id="response{{ request.RequestID }}" 
+                                  rows="6" placeholder="Type your response to the user...">{{ request.AdminResponse or '' }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="send_email" value="1" checked>
+                            <label class="form-check-label">
+                                Send email notification to user
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-1"></i>Send Response
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleSelectAll() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.request-checkbox');
+    const bulkActions = document.getElementById('bulkActions');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAll.checked;
+    });
+    
+    if (selectAll.checked) {
+        bulkActions.classList.remove('d-none');
+    } else {
+        bulkActions.classList.add('d-none');
+    }
+}
+
+function updateStatus(requestId, status) {
+    if (confirm(`Are you sure you want to mark this request as ${status}?`)) {
+        fetch(`/admin/contact-requests/${requestId}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error updating status: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error updating status: ' + error);
+        });
+    }
+}
+
+function assignRequest(requestId) {
+    const adminId = prompt('Enter admin user ID to assign to:');
+    if (adminId) {
+        fetch(`/admin/contact-requests/${requestId}/assign`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ admin_id: adminId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error assigning request: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error assigning request: ' + error);
+        });
+    }
+}
+
+function refreshRequests() {
+    location.reload();
+}
+
+function bulkUpdateStatus(status) {
+    const selectedIds = Array.from(document.querySelectorAll('.request-checkbox:checked'))
+                            .map(cb => cb.value);
+    
+    if (selectedIds.length === 0) {
+        alert('Please select requests to update');
+        return;
+    }
+    
+    if (confirm(`Update ${selectedIds.length} requests to ${status}?`)) {
+        fetch('/admin/contact-requests/bulk-update', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                request_ids: selectedIds,
+                status: status 
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error updating requests: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error updating requests: ' + error);
+        });
+    }
+}
+
+// Auto-refresh every 30 seconds for open requests
+if (window.location.search.includes('status=open') || !window.location.search.includes('status=')) {
+    setInterval(function() {
+        const indicator = document.createElement('div');
+        indicator.className = 'position-fixed top-0 end-0 m-3 bg-primary text-white px-2 py-1 rounded';
+        indicator.textContent = 'Checking for new requests...';
+        document.body.appendChild(indicator);
+        
+        setTimeout(() => {
+            document.body.removeChild(indicator);
+        }, 2000);
+    }, 30000);
+}
+</script>
+{% endblock %}

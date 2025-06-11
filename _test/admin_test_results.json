@@ -1,0 +1,79 @@
+{
+  "admin_routes": {
+    "/admin": {
+      "status_code": 200,
+      "accessible": true,
+      "content_length": 16811
+    },
+    "/admin/dashboard": {
+      "status_code": 200,
+      "accessible": true,
+      "content_length": 16811
+    },
+    "/admin/users": {
+      "status_code": 200,
+      "accessible": true,
+      "content_length": 16811
+    },
+    "/admin/pending-instructors": {
+      "status_code": 200,
+      "accessible": true,
+      "content_length": 16811
+    },
+    "/admin/pending-companies": {
+      "status_code": 200,
+      "accessible": true,
+      "content_length": 16811
+    },
+    "/admin/pending-courses": {
+      "status_code": 200,
+      "accessible": true,
+      "content_length": 16811
+    },
+    "/admin/subscriptions": {
+      "status_code": 200,
+      "accessible": true,
+      "content_length": 16811
+    },
+    "/admin/settings": {
+      "status_code": 200,
+      "accessible": true,
+      "content_length": 16811
+    },
+    "/admin/reports": {
+      "status_code": 200,
+      "accessible": true,
+      "content_length": 16811
+    },
+    "/admin/contact-requests": {
+      "status_code": 200,
+      "accessible": true,
+      "content_length": 16811
+    }
+  },
+  "api_endpoints": {
+    "/admin/api/stats": {
+      "status_code": 401,
+      "valid_json": false
+    },
+    "/admin/api/notifications": {
+      "status_code": 401,
+      "valid_json": false
+    },
+    "/admin/api/activity": {
+      "status_code": 401,
+      "valid_json": false
+    }
+  },
+  "upload_endpoints": {
+    "/uploads/list/profiles": {
+      "status_code": 401
+    },
+    "/uploads/list/courses": {
+      "status_code": 401
+    },
+    "/uploads/list/admin": {
+      "status_code": 401
+    }
+  }
+}

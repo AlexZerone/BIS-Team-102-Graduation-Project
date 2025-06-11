@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Support - Sec Era{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3" style="color: #223947;">
+            <i class="fas fa-headset me-3"></i>
+            Contact Support
+        </h1>
+        <p class="lead text-muted mb-4">Get help from our expert support team</p>
+        
+        <!-- Quick Stats -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-8">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-flex mb-2">
+                                <i class="fas fa-clock fa-2x text-success"></i>
+                            </div>
+                            <h6 class="fw-bold">24 Hour Response</h6>
+                            <small class="text-muted">Average response time</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="rounded-circle bg-primary bg-opacity-10 p-3 d-inline-flex mb-2">
+                                <i class="fas fa-users fa-2x text-primary"></i>
+                            </div>
+                            <h6 class="fw-bold">Expert Team</h6>
+                            <small class="text-muted">Cybersecurity professionals</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="rounded-circle bg-info bg-opacity-10 p-3 d-inline-flex mb-2">
+                                <i class="fas fa-star fa-2x text-info"></i>
+                            </div>
+                            <h6 class="fw-bold">98% Satisfaction</h6>
+                            <small class="text-muted">Customer satisfaction rate</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Contact Form -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header" style="background-color: #223947; color: white;">
+                    <h4 class="mb-0">
+                        <i class="fas fa-envelope me-2"></i>
+                        Send Us a Message
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" id="contactForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label fw-bold">
+                                    Full Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="name" name="name" required
+                                       value="{{ session.get('user_name', '') if session.get('user_id') else '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label fw-bold">
+                                    Email Address <span class="text-danger">*</span>
+                                </label>
+                                <input type="email" class="form-control" id="email" name="email" required
+                                       value="{{ session.get('user_email', '') if session.get('user_id') else '' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label fw-bold">Category</label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="general">General Question</option>
+                                    <option value="technical">Technical Issue</option>
+                                    <option value="billing">Billing & Subscriptions</option>
+                                    <option value="course">Course Content</option>
+                                    <option value="account">Account Management</option>
+                                    <option value="feature">Feature Request</option>
+                                    <option value="bug">Bug Report</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="priority" class="form-label fw-bold">Priority</label>
+                                <select class="form-select" id="priority" name="priority">
+                                    <option value="low">Low - General inquiry</option>
+                                    <option value="normal" selected>Normal - Standard issue</option>
+                                    <option value="high">High - Urgent issue</option>
+                                    <option value="critical">Critical - System down</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="subject" class="form-label fw-bold">
+                                Subject <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="subject" name="subject" required
+                                   placeholder="Brief description of your issue or question">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="message" class="form-label fw-bold">
+                                Message <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control" id="message" name="message" rows="6" required
+                                      placeholder="Please provide as much detail as possible..."></textarea>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Include steps to reproduce any issues, error messages, and your browser/device information.
+                            </div>
+                        </div>
+                        
+                        <!-- System Information (Auto-filled) -->
+                        <div class="collapse" id="systemInfo">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-2">System Information (automatically included)</h6>
+                                    <div class="row small">
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Browser:</strong> <span id="browserInfo">Loading...</span></p>
+                                            <p class="mb-1"><strong>Screen:</strong> <span id="screenInfo">Loading...</span></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Platform:</strong> <span id="platformInfo">Loading...</span></p>
+                                            <p class="mb-1"><strong>Timestamp:</strong> <span id="timestampInfo">Loading...</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" 
+                                    data-bs-target="#systemInfo">
+                                <i class="fas fa-desktop me-1"></i>
+                                Show System Info
+                            </button>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contact Information -->
+        <div class="col-lg-4">
+            <!-- Quick Help -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-rocket me-2"></i>
+                        Quick Help
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Before contacting support, try these quick solutions:</p>
+                    <div class="list-group list-group-flush">
+                        <a href="{{ url_for('help.faq') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-question-circle me-2 text-primary"></i>
+                            Check our FAQ
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" onclick="clearCache()">
+                            <i class="fas fa-refresh me-2 text-success"></i>
+                            Clear browser cache
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" onclick="checkStatus()">
+                            <i class="fas fa-heartbeat me-2 text-info"></i>
+                            Check system status
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Direct Contact -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-phone me-2"></i>
+                        Direct Contact
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="fw-bold">📧 Email Support</h6>
+                        <p class="mb-1">support@secera.com</p>
+                        <small class="text-muted">24/7 - Response within 24 hours</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="fw-bold">📞 Phone Support</h6>
+                        <p class="mb-1">+1 (555) 123-4567</p>
+                        <small class="text-muted">Mon-Fri, 9AM-6PM EST</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="fw-bold">💬 Live Chat</h6>
+                        <p class="mb-1">Available on platform</p>
+                        <small class="text-muted">Mon-Fri, 9AM-9PM EST</small>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button class="btn btn-success" onclick="startLiveChat()">
+                            <i class="fas fa-comments me-1"></i>
+                            Start Live Chat
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Emergency Contact -->
+            <div class="card border-0 shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Emergency?
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="small mb-2">For critical security issues or system outages:</p>
+                    <div class="d-grid">
+                        <a href="tel:+15551234567" class="btn btn-danger">
+                            <i class="fas fa-phone me-1"></i>
+                            Emergency Line
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-fill system information
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('browserInfo').textContent = navigator.userAgent.split(' ')[0] + ' ' + navigator.userAgent.match(/Chrome\/[\d.]*/)[0];
+    document.getElementById('screenInfo').textContent = screen.width + 'x' + screen.height;
+    document.getElementById('platformInfo').textContent = navigator.platform;
+    document.getElementById('timestampInfo').textContent = new Date().toLocaleString();
+});
+
+// Form validation and submission
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Basic validation
+    const requiredFields = ['name', 'email', 'subject', 'message'];
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        const element = document.getElementById(field);
+        if (!element.value.trim()) {
+            isValid = false;
+            element.classList.add('is-invalid');
+        } else {
+            element.classList.remove('is-invalid');
+        }
+    });
+    
+    if (!isValid) {
+        showAlert('Please fill in all required fields', 'danger');
+        return;
+    }
+    
+    // Email validation
+    const email = document.getElementById('email').value;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        document.getElementById('email').classList.add('is-invalid');
+        showAlert('Please enter a valid email address', 'danger');
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+    submitBtn.disabled = true;
+    
+    // Submit form (in real implementation, this would be an AJAX call)
+    setTimeout(() => {
+        this.submit();
+    }, 1000);
+});
+
+function clearCache() {
+    if (confirm('This will clear your browser cache and reload the page. Continue?')) {
+        // In a real implementation, this would provide instructions
+        location.reload(true);
+    }
+}
+
+function checkStatus() {
+    // In a real implementation, this would check system status
+    showAlert('All systems operational ✅', 'success');
+}
+
+function startLiveChat() {
+    // In a real implementation, this would open a chat widget
+    showAlert('Live chat is currently unavailable. Please use the contact form or email us directly.', 'info');
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1060; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentElement) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Category-specific help text
+document.getElementById('category').addEventListener('change', function() {
+    const category = this.value;
+    const messageField = document.getElementById('message');
+    
+    const helpTexts = {
+        'technical': 'Please describe the technical issue you\'re experiencing. Include any error messages, the steps you took before the issue occurred, and your browser/device information.',
+        'billing': 'Please provide details about your billing inquiry. Include your subscription plan, payment method, and any relevant transaction information.',
+        'course': 'Tell us about the course content issue. Include the course name, lesson/module, and specific details about the problem.',
+        'account': 'Describe the account-related issue you\'re experiencing. Include your email address and any relevant account information.',
+        'bug': 'Please provide detailed steps to reproduce the bug, expected behavior vs actual behavior, and any error messages you received.',
+        'feature': 'Describe the feature you\'d like to see added or improved. Explain how it would benefit your learning experience.'
+    };
+    
+    if (helpTexts[category]) {
+        messageField.placeholder = helpTexts[category];
+    } else {
+        messageField.placeholder = 'Please provide as much detail as possible...';
+    }
+});
+</script>
+{% endblock %}

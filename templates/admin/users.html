@@ -1,0 +1,231 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}User Management - Admin{% endblock %}
+
+{% block page_title %}User Management{% endblock %}
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="page-title">
+        <i class="fas fa-users me-2"></i>
+        User Management
+    </h2>
+    <div class="d-flex gap-2">
+        <span class="badge bg-info">{{ users|length }} users shown</span>
+        <button class="btn btn-admin btn-sm" onclick="exportUsers()">
+            <i class="fas fa-download me-1"></i>Export
+        </button>
+    </div>
+</div>
+
+    <!-- Search and Filters -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Search Users</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ search }}" placeholder="Search by name or email">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="type" class="form-label">User Type</label>
+                            <select class="form-select" id="type" name="type">
+                                <option value="all" {% if user_type == 'all' %}selected{% endif %}>All Types</option>
+                                <option value="student" {% if user_type == 'student' %}selected{% endif %}>Students</option>
+                                <option value="instructor" {% if user_type == 'instructor' %}selected{% endif %}>Instructors</option>
+                                <option value="company" {% if user_type == 'company' %}selected{% endif %}>Companies</option>
+                                <option value="admin" {% if user_type == 'admin' %}selected{% endif %}>Admins</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="all" {% if status == 'all' %}selected{% endif %}>All Status</option>
+                                <option value="Active" {% if status == 'Active' %}selected{% endif %}>Active</option>
+                                <option value="Inactive" {% if status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                                <option value="Suspended" {% if status == 'Suspended' %}selected{% endif %}>Suspended</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-1"></i> Filter
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-table me-2"></i>Users List
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if users %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>User</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Approval</th>
+                                    <th>Extra Info</th>
+                                    <th>Joined</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle bg-{{ 'success' if user.Status == 'Active' else 'secondary' }} bg-opacity-10 p-2 me-3">
+                                                <i class="fas fa-user fa-sm text-{{ 'success' if user.Status == 'Active' else 'secondary' }}"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">{{ user.First }} {{ user.Last }}</div>
+                                                <small class="text-muted">{{ user.Email }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'primary' if user.UserType == 'student' else 'warning' if user.UserType == 'instructor' else 'info' if user.UserType == 'company' else 'danger' }}">
+                                            {{ user.UserType|title }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if user.Status == 'Active' else 'secondary' if user.Status == 'Inactive' else 'danger' }}">
+                                            {{ user.Status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if user.ApprovalStatus %}
+                                        <span class="badge bg-{{ 'success' if user.ApprovalStatus == 'Approved' else 'warning' if user.ApprovalStatus == 'Pending' else 'danger' }}">
+                                            {{ user.ApprovalStatus }}
+                                        </span>
+                                        {% else %}
+                                        <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.ExtraInfo %}
+                                        <small class="text-muted">{{ user.ExtraInfo }}</small>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ user.CreatedAt.strftime('%Y-%m-%d') }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <form method="POST" action="{{ url_for('admin.toggle_user_status', user_id=user.UserID) }}" class="d-inline">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fas fa-{{ 'ban' if user.Status == 'Active' else 'check' }} me-2"></i>
+                                                            {{ 'Deactivate' if user.Status == 'Active' else 'Activate' }}
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item text-info" href="#" data-bs-toggle="modal" 
+                                                       data-bs-target="#userModal{{ user.UserID }}">
+                                                        <i class="fas fa-eye me-2"></i>View Details
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No users found</h5>
+                        <p class="text-muted">Try adjusting your search filters</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <nav aria-label="User pagination">
+                <ul class="pagination justify-content-center">
+                    {% for page_num in range(1, total_pages + 1) %}
+                    <li class="page-item {% if page_num == page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('admin.users', page=page_num, search=search, type=user_type, status=status) }}">
+                            {{ page_num }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- User Detail Modals -->
+{% for user in users %}
+<div class="modal fade" id="userModal{{ user.UserID }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Details: {{ user.First }} {{ user.Last }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Email:</strong> {{ user.Email }}</p>
+                        <p><strong>User Type:</strong> {{ user.UserType|title }}</p>
+                        <p><strong>Status:</strong> {{ user.Status }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Joined:</strong> {{ user.CreatedAt.strftime('%Y-%m-%d %H:%M') }}</p>
+                        <p><strong>Last Updated:</strong> {{ user.UpdatedAt.strftime('%Y-%m-%d %H:%M') if user.UpdatedAt else 'N/A' }}</p>
+                        {% if user.ApprovalStatus %}
+                        <p><strong>Approval Status:</strong> {{ user.ApprovalStatus }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if user.ExtraInfo %}
+                <hr>
+                <p><strong>Additional Information:</strong> {{ user.ExtraInfo }}</p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

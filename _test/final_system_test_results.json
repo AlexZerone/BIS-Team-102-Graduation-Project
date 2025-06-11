@@ -1,0 +1,99 @@
+{
+  "timestamp": "2025-06-11T22:48:04.341821",
+  "tests": {
+    "/": {
+      "status": "PASS",
+      "code": 200
+    },
+    "/register": {
+      "status": "PASS",
+      "code": 200
+    },
+    "/login": {
+      "status": "PASS",
+      "code": 200
+    },
+    "/help": {
+      "status": "FAIL",
+      "code": 500
+    },
+    "/help/getting-started": {
+      "status": "FAIL",
+      "code": 404
+    },
+    "/pages/about": {
+      "status": "FAIL",
+      "code": 404
+    },
+    "/pages/contact": {
+      "status": "FAIL",
+      "code": 404
+    },
+    "/dashboard": {
+      "status": "PASS",
+      "code": 302,
+      "note": "Auth Required"
+    },
+    "/courses": {
+      "status": "PASS",
+      "code": 302,
+      "note": "Auth Required"
+    },
+    "/assignments": {
+      "status": "PASS",
+      "code": 302,
+      "note": "Auth Required"
+    },
+    "/jobs": {
+      "status": "PASS",
+      "code": 302,
+      "note": "Auth Required"
+    },
+    "/profile": {
+      "status": "FAIL",
+      "code": 404
+    },
+    "/enrollment": {
+      "status": "PASS",
+      "code": 302,
+      "note": "Auth Required"
+    },
+    "/admin": {
+      "status": "FAIL",
+      "code": 308
+    },
+    "/admin/dashboard": {
+      "status": "PASS",
+      "code": 302,
+      "note": "Admin Auth Required"
+    },
+    "/admin/users": {
+      "status": "PASS",
+      "code": 302,
+      "note": "Admin Auth Required"
+    },
+    "/admin/settings": {
+      "status": "PASS",
+      "code": 302,
+      "note": "Admin Auth Required"
+    }
+  },
+  "summary": {
+    "total_tests": 17,
+    "passed": 11,
+    "failed": 6,
+    "success_rate": 64.70588235294117,
+    "public_pages": {
+      "total": 7,
+      "passed": 3
+    },
+    "auth_pages": {
+      "total": 6,
+      "passed": 5
+    },
+    "admin_pages": {
+      "total": 4,
+      "passed": 3
+    }
+  }
+}

@@ -1,0 +1,227 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Pending Companies - Admin{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-building me-2 text-info"></i>
+Pending Company Approvals
+{% endblock %}
+
+{% block page_actions %}
+<span class="badge bg-info">{{ companies|length }} pending</span>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Pending Companies -->
+    <div class="row">
+        <div class="col-md-12">
+            {% if companies %}
+                {% for company in companies %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-building me-2"></i>
+                            {{ company.Name or (company.First + ' ' + company.Last) }}
+                        </h5>
+                        <span class="badge bg-info">Pending Review</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><strong>Contact Person:</strong> {{ company.First }} {{ company.Last }}</p>
+                                        <p class="mb-2"><strong>Email:</strong> {{ company.Email }}</p>
+                                        <p class="mb-2"><strong>Company Name:</strong> {{ company.Name or 'Not specified' }}</p>
+                                        <p class="mb-2"><strong>Industry:</strong> {{ company.Industry or 'Not specified' }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><strong>Location:</strong> {{ company.Location or 'Not specified' }}</p>
+                                        <p class="mb-2"><strong>Company Size:</strong> {{ company.CompanySize or 'Not specified' }}</p>
+                                        <p class="mb-2"><strong>Founded:</strong> {{ company.FoundedDate.strftime('%Y') if company.FoundedDate else 'Not specified' }}</p>
+                                        <p class="mb-2"><strong>Applied:</strong> {{ company.CreatedAt.strftime('%Y-%m-%d %H:%M') }}</p>
+                                    </div>
+                                </div>
+                                
+                                {% if company.Description %}
+                                <div class="mb-3">
+                                    <strong>Company Description:</strong>
+                                    <p class="text-muted">{{ company.Description }}</p>
+                                </div>
+                                {% endif %}
+
+                                {% if company.Website %}
+                                <div class="mb-3">
+                                    <strong>Website:</strong>
+                                    <a href="{{ company.Website }}" target="_blank" class="text-primary">{{ company.Website }}</a>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title">Quick Actions</h6>
+                                        <div class="d-grid gap-2">
+                                            <button type="button" class="btn btn-success" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#approveModal{{ company.CompanyID }}">
+                                                <i class="fas fa-check me-2"></i>Approve
+                                            </button>
+                                            <button type="button" class="btn btn-danger" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#rejectModal{{ company.CompanyID }}">
+                                                <i class="fas fa-times me-2"></i>Reject
+                                            </button>
+                                            <button type="button" class="btn btn-outline-info" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#detailModal{{ company.CompanyID }}">
+                                                <i class="fas fa-eye me-2"></i>View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approve Modal -->
+                <div class="modal fade" id="approveModal{{ company.CompanyID }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">                            <form method="POST" action="{{ url_for('admin.approve_company', company_id=company.CompanyID) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="modal-header bg-success text-white">
+                                    <h5 class="modal-title">Approve Company</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to approve <strong>{{ company.Name or (company.First + ' ' + company.Last) }}</strong>?</p>
+                                    <p class="text-muted">This will activate their account and grant company privileges including job posting abilities.</p>
+                                    
+                                    <div class="mb-3">
+                                        <label for="reason" class="form-label">Approval Notes (Optional)</label>
+                                        <textarea class="form-control" name="reason" rows="3" 
+                                                  placeholder="Add any notes about this approval..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" name="action" value="approve" class="btn btn-success">
+                                        <i class="fas fa-check me-1"></i>Approve Company
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reject Modal -->
+                <div class="modal fade" id="rejectModal{{ company.CompanyID }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">                            <form method="POST" action="{{ url_for('admin.approve_company', company_id=company.CompanyID) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">Reject Company Application</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to reject <strong>{{ company.Name or (company.First + ' ' + company.Last) }}</strong>'s company application?</p>
+                                    
+                                    <div class="mb-3">
+                                        <label for="reason" class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" name="reason" rows="3" required
+                                                  placeholder="Please provide a reason for rejection..."></textarea>
+                                        <small class="text-muted">This reason will be saved for record keeping.</small>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-danger">
+                                        <i class="fas fa-times me-1"></i>Reject Application
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Modal -->
+                <div class="modal fade" id="detailModal{{ company.CompanyID }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Company Application Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Contact Information</h6>
+                                        <p><strong>Contact Person:</strong> {{ company.First }} {{ company.Last }}</p>
+                                        <p><strong>Email:</strong> {{ company.Email }}</p>
+                                        <p><strong>Phone:</strong> {{ company.Phone or 'Not provided' }}</p>
+                                        <p><strong>Position:</strong> {{ company.Position or 'Not specified' }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Company Information</h6>
+                                        <p><strong>Company Name:</strong> {{ company.Name or 'Not specified' }}</p>
+                                        <p><strong>Industry:</strong> {{ company.Industry or 'Not specified' }}</p>
+                                        <p><strong>Location:</strong> {{ company.Location or 'Not specified' }}</p>
+                                        <p><strong>Company Size:</strong> {{ company.CompanySize or 'Not specified' }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Founded:</strong> {{ company.FoundedDate.strftime('%Y') if company.FoundedDate else 'Not specified' }}</p>
+                                        <p><strong>Website:</strong> 
+                                            {% if company.Website %}
+                                                <a href="{{ company.Website }}" target="_blank">{{ company.Website }}</a>
+                                            {% else %}
+                                                Not provided
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Registration Number:</strong> {{ company.RegistrationNumber or 'Not provided' }}</p>
+                                        <p><strong>Tax ID:</strong> {{ company.TaxID or 'Not provided' }}</p>
+                                    </div>
+                                </div>
+
+                                {% if company.Description %}
+                                <hr>
+                                <h6 class="text-primary">Company Description</h6>
+                                <p>{{ company.Description }}</p>
+                                {% endif %}
+
+                                {% if company.Services %}
+                                <hr>
+                                <h6 class="text-primary">Services/Products</h6>
+                                <p>{{ company.Services }}</p>
+                                {% endif %}
+
+                                <hr>
+                                <h6 class="text-primary">Application Timeline</h6>
+                                <p><strong>Submitted:</strong> {{ company.CreatedAt.strftime('%Y-%m-%d %H:%M') }}</p>
+                                <p><strong>Last Updated:</strong> {{ company.UpdatedAt.strftime('%Y-%m-%d %H:%M') if company.UpdatedAt else 'N/A' }}</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <h4 class="text-muted">No Pending Company Applications</h4>
+                    <p class="text-muted">All company applications have been processed.</p>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">
+                        <i class="fas fa-tachometer-alt me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            {% endif %}{% endblock %}

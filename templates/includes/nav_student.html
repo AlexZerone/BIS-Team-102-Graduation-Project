@@ -22,12 +22,34 @@
            href="{{ url_for('jobs.jobs') }}">
            <i class="fas fa-briefcase"></i> Jobs
         </a>
-    </li>
-    <li class="nav-item">
+    </li>    <li class="nav-item">
         <a class="nav-link {% if request.endpoint == 'enrollments.enrollment' %}active{% endif %}" 
            href="{{ url_for('enrollments.enrollment') }}">
            <i class="fas fa-sign-in-alt"></i> Enroll
         </a>
+    </li>    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'subscriptions.current_subscription' %}active{% endif %}" 
+           href="{{ url_for('subscriptions.current_subscription') }}">
+           <i class="fas fa-crown"></i> My Plan
+        </a>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle {% if request.blueprint == 'help' %}active{% endif %}" 
+           href="#" id="helpDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+           <i class="fas fa-question-circle"></i> Help
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="helpDropdown">
+            <li><a class="dropdown-item" href="{{ url_for('help.faq') }}">
+                <i class="fas fa-question-circle me-2"></i>FAQ
+            </a></li>
+            <li><a class="dropdown-item" href="{{ url_for('help.contact') }}">
+                <i class="fas fa-envelope me-2"></i>Contact Support
+            </a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ url_for('help.about') }}">
+                <i class="fas fa-info-circle me-2"></i>About Us
+            </a></li>
+        </ul>
     </li>
 </ul>
 

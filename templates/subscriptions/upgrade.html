@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}Upgrade to {{ plan.Name }} - Sec Era{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Progress Steps -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h1 class="h3 mb-0">
+                            <i class="fas fa-arrow-up me-2" style="color: #223947;"></i>
+                            Upgrade Your Plan
+                        </h1>
+                        <a href="{{ url_for('subscriptions.plans') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Plans
+                        </a>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="progress mb-4" style="height: 8px;">
+                        <div class="progress-bar" style="width: 33%; background-color: #223947;" role="progressbar"></div>
+                    </div>
+                    
+                    <nav aria-label="Upgrade steps">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item active">Plan Selection</li>
+                            <li class="breadcrumb-item text-muted">Payment Details</li>
+                            <li class="breadcrumb-item text-muted">Confirmation</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Plan Comparison -->
+                <div class="col-md-8">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header" style="background-color: #223947; color: white;">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-line me-2"></i>Plan Comparison
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Current Plan -->
+                                <div class="col-md-6">
+                                    <div class="text-center p-3 bg-light rounded">
+                                        <h6 class="text-muted">Current Plan</h6>
+                                        <h4 class="fw-bold">{{ student.SubscriptionTier|title }}</h4>
+                                        <div class="mb-3">
+                                            {% if student.SubscriptionTier == 'freemium' %}
+                                            <span class="display-6 fw-bold">FREE</span>
+                                            {% else %}
+                                            <span class="display-6 fw-bold">${{ "%.0f"|format(student.Price or 0) }}</span>
+                                            <span class="text-muted">/month</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- New Plan -->
+                                <div class="col-md-6">
+                                    <div class="text-center p-3 border-2 border-primary rounded position-relative">
+                                        <div class="position-absolute top-0 start-50 translate-middle">
+                                            <span class="badge bg-primary px-3 py-2">Upgrading To</span>
+                                        </div>
+                                        <h6 class="text-muted mt-3">New Plan</h6>
+                                        <h4 class="fw-bold text-primary">{{ plan.Name }}</h4>
+                                        <div class="mb-3">
+                                            <span class="display-6 fw-bold text-primary">${{ "%.0f"|format(plan.Price) }}</span>
+                                            <span class="text-muted">
+                                                /{% if plan.BillingCycle == 'monthly' %}month{% else %}year{% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Feature Comparison -->
+                            <div class="mt-4">
+                                <h6 class="fw-bold mb-3">What You'll Get:</h6>
+                                {% if plan.Features %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled">
+                                            {% if plan.Features.courses %}
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                <strong>Course Access:</strong>
+                                                {% if plan.Features.courses == 'unlimited' %}
+                                                Unlimited courses
+                                                {% elif plan.Features.courses == 'all_free' %}
+                                                All free courses
+                                                {% else %}
+                                                {{ plan.Features.courses|title }}
+                                                {% endif %}
+                                            </li>
+                                            {% endif %}
+                                            
+                                            {% if plan.Features.certifications %}
+                                            <li class="mb-2">
+                                                <i class="fas fa-certificate text-warning me-2"></i>
+                                                <strong>Certifications:</strong> {{ plan.Features.certifications|title }}
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled">
+                                            {% if plan.Features.live_sessions %}
+                                            <li class="mb-2">
+                                                <i class="fas fa-video text-info me-2"></i>
+                                                <strong>Live Sessions:</strong> Included
+                                            </li>
+                                            {% endif %}
+                                            
+                                            {% if plan.Features.coaching %}
+                                            <li class="mb-2">
+                                                <i class="fas fa-user-tie text-primary me-2"></i>
+                                                <strong>Personal Coaching:</strong> Available
+                                            </li>
+                                            {% endif %}
+                                            
+                                            {% if plan.Features.support %}
+                                            <li class="mb-2">
+                                                <i class="fas fa-headset text-secondary me-2"></i>
+                                                <strong>Support:</strong> {{ plan.Features.support|title }}
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Options -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-credit-card me-2"></i>Payment Options
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('subscriptions.checkout') }}">
+                                <input type="hidden" name="plan_id" value="{{ plan.PlanID }}">
+                                
+                                <!-- Payment Method Selection -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Payment Method</label>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="payment_method" 
+                                                       id="credit_card" value="credit_card" checked>
+                                                <label class="form-check-label" for="credit_card">
+                                                    <i class="fas fa-credit-card me-2"></i>Credit/Debit Card
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="payment_method" 
+                                                       id="paypal" value="paypal">
+                                                <label class="form-check-label" for="paypal">
+                                                    <i class="fab fa-paypal me-2"></i>PayPal
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Installment Option (for annual plans) -->
+                                {% if plan.Name == 'premium_annual' %}
+                                <div class="mb-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="is_installment" 
+                                                       id="installment" value="true" onchange="toggleInstallment()">
+                                                <label class="form-check-label" for="installment">
+                                                    <strong>Pay in 12 monthly installments</strong>
+                                                </label>
+                                            </div>
+                                            <div class="ms-4 mt-2">
+                                                <small class="text-muted">
+                                                    Instead of paying ${{ "%.2f"|format(plan.Price) }} upfront, 
+                                                    pay ${{ "%.2f"|format(plan.Price / 12) }} per month for 12 months.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{{ url_for('subscriptions.plans') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i>Change Plan
+                                    </a>
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-arrow-right me-1"></i>
+                                        Proceed to Payment
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Order Summary -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm position-sticky" style="top: 20px;">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-shopping-cart me-2"></i>Order Summary
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="fw-bold">{{ plan.Name }}</h6>
+                                <p class="text-muted small">{{ plan.Description }}</p>
+                            </div>
+                            
+                            <div class="border-top pt-3">
+                                {% if proration_info and proration_info.current_plan_refund > 0 %}
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Plan Price:</span>
+                                    <span>${{ "%.2f"|format(plan.Price) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2 text-success">
+                                    <span>Proration Credit:</span>
+                                    <span>-${{ "%.2f"|format(proration_info.current_plan_refund) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3 fw-bold border-top pt-2">
+                                    <span>Total Due Today:</span>
+                                    <span id="totalAmount">${{ "%.2f"|format(proration_info.total_due) }}</span>
+                                </div>
+                                {% else %}
+                                <div class="d-flex justify-content-between mb-3 fw-bold">
+                                    <span>Total:</span>
+                                    <span id="totalAmount">${{ "%.2f"|format(plan.Price) }}</span>
+                                </div>
+                                {% endif %}
+                                
+                                <div id="installmentInfo" class="alert alert-info d-none">
+                                    <small>
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        First payment: ${{ "%.2f"|format(plan.Price / 12) }}<br>
+                                        Then ${{ "%.2f"|format(plan.Price / 12) }}/month for 11 months
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <!-- Guarantee -->
+                            <div class="text-center mt-3 p-3 bg-light rounded">
+                                <i class="fas fa-shield-alt text-success fa-2x mb-2"></i>
+                                <h6 class="fw-bold">30-Day Money-Back Guarantee</h6>
+                                <small class="text-muted">Cancel anytime within 30 days for a full refund</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Support -->
+                    <div class="card border-0 shadow-sm mt-4">
+                        <div class="card-body text-center">
+                            <h6 class="fw-bold mb-3">Need Help?</h6>
+                            <p class="text-muted small mb-3">Our team is here to help you choose the right plan</p>
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('help.contact') }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-phone me-1"></i>Contact Support
+                                </a>
+                                <a href="{{ url_for('help.faq') }}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-question-circle me-1"></i>View FAQ
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleInstallment() {
+    const checkbox = document.getElementById('installment');
+    const installmentInfo = document.getElementById('installmentInfo');
+    const totalAmount = document.getElementById('totalAmount');
+    
+    if (checkbox.checked) {
+        installmentInfo.classList.remove('d-none');
+        totalAmount.textContent = '${{ "%.2f"|format(plan.Price / 12) }}';
+    } else {
+        installmentInfo.classList.add('d-none');
+        totalAmount.textContent = '${{ "%.2f"|format(proration_info.total_due if proration_info and proration_info.total_due else plan.Price) }}';
+    }
+}
+
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+            if (!paymentMethod) {
+                e.preventDefault();
+                alert('Please select a payment method');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Processing...';
+            submitBtn.disabled = true;
+        });
+    }
+});
+</script>
+{% endblock %}
