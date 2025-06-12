@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Job Details - {{ job.Title }}{% endblock %}
+{% block title %}
+Job Details - {{ job.Title }}
+{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -50,15 +52,26 @@
                     <p class="mb-0"><i class="fas fa-money-bill-wave"></i> {{ job.SalaryRange }}</p>
                 </div>
             </div>
-            <div class="col-md-4 text-end">                {% if session.user_type == 'student' %}
+            <div class="col-md-4 text-end">
+                {% if session.user_type == 'student' %}
                     {% if not application %}
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#applyModal">
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#applyModal"
+                        >
                             Apply Now
                         </button>
                     {% else %}
                         <div class="alert alert-info application-status">
                             {% if application.StatusID %}
-                                {% set status_name = {1: 'Pending', 2: 'Under Review', 3: 'Accepted', 4: 'Rejected'}.get(application.StatusID, 'Unknown') %}
+                                {% set status_name = {
+                                    1: 'Pending',
+                                    2: 'Under Review',
+                                    3: 'Accepted',
+                                    4: 'Rejected'
+                                }.get(application.StatusID, 'Unknown') %}
                                 Application Status: {{ status_name }}
                             {% else %}
                                 Application Status: Pending
@@ -86,7 +99,10 @@
                     <h5 class="card-title">Requirements</h5>
                     <ul class="requirements-list">
                         {% for requirement in job.Requirements.split('\n') %}
-                            <li><i class="fas fa-check-circle text-success me-2"></i>{{ requirement }}</li>
+                            <li>
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                {{ requirement }}
+                            </li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -100,7 +116,7 @@
                     <p><strong>Type:</strong> {{ job.Type }}</p>
                     <p><strong>Posted:</strong> {{ job.PostingDate.strftime('%Y-%m-%d') }}</p>
                     <p><strong>Deadline:</strong> {{ job.DeadlineDate.strftime('%Y-%m-%d') }}</p>
-                    
+
                     {% if session.user_type == 'company' and job.ApplicationCount is defined %}
                         <hr>
                         <h6>Applications Received: {{ job.ApplicationCount }}</h6>
@@ -112,28 +128,77 @@
 </div>
 
 {% if session.user_type == 'student' and not application %}
-<!-- Apply Modal -->
-<div class="modal fade" id="applyModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">            <form action="{{ url_for('jobs.apply_job', job_id=job.JobID) }}" method="POST">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div class="modal-header">
-                    <h5 class="modal-title">Apply for {{ job.Title }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="resume" class="form-label">Resume/Cover Letter</label>
-                        <textarea class="form-control" id="resume" name="resume" rows="6" required></textarea>
+    <!-- Apply Modal -->
+    <div class="modal fade" id="applyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form
+                    action="{{ url_for('jobs.apply_job', job_id=job.JobID) }}"
+                    method="POST"
+                >
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Apply for {{ job.Title }}</h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                        ></button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit Application</button>
-                </div>
-            </form>
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <form
+                                action="/uploads/admin-document"
+                                method="POST"
+                                enctype="multipart/form-data"
+                            >
+                                <div class="mb-3">
+                                    <label for="resume-file" class="form-label">
+                                        Resume / Cover Letter
+                                    </label>
+                                    <input
+                                        class="form-control"
+                                        type="file"
+                                        id="resume-file"
+                                        name="file"
+                                        accept=".pdf,.doc,.docx"
+                                        required
+                                    >
+                                    <!-- tell backend this is a resume upload -->
+                                    <input
+                                        type="hidden"
+                                        name="document_type"
+                                        value="resume"
+                                    >
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    Upload
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Submit Application
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 {% endif %}
 {% endblock %}

@@ -117,7 +117,7 @@ Subscription Management
                                         {% if plan.Price == 0 %}
                                         <span class="badge bg-success">FREE</span>
                                         {% else %}
-                                        <strong>${{ "%.2f"|format(plan.Price) }}</strong>
+                                        <strong>EGP{{ "%.2f"|format(plan.Price) }}</strong>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -147,7 +147,7 @@ Subscription Management
                                             <ul class="dropdown-menu">
                                                 <li>
                                                     <a class="dropdown-item" href="#" data-bs-toggle="modal" 
-                                                       data-bs-target="#editPlanModal{{ plan.PlanID }}">
+                                                        data-bs-target="#editPlanModal{{ plan.PlanID }}">
                                                         <i class="fas fa-edit me-2"></i>Edit
                                                     </a>
                                                 </li>

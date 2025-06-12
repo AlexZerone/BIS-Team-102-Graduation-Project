@@ -2,7 +2,6 @@ from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 from config import Config
 from extensions import mysql
-
 from routes.auth import auth_bp
 from routes.home import home_bp
 from routes.courses import courses_bp
@@ -15,7 +14,7 @@ from routes.admin import admin_bp
 from routes.subscriptions import subscriptions_bp
 from routes.pages import pages_bp
 from routes.help import help_bp
-from routes.uploads_simple import uploads_bp
+from routes.uploads import uploads_bp
 from initialize_statuses import initialize_application_statuses
 
 def create_app():
