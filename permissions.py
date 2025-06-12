@@ -11,6 +11,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
 def role_required(allowed_roles):
     def decorator(f):
         @wraps(f)

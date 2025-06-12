@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}{{ error_code }} Error - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body text-center py-5">
+                    <!-- Error Icon -->
+                    <div class="mb-4">
+                        {% if error_code == 403 %}
+                        <i class="fas fa-ban fa-4x text-danger"></i>
+                        {% elif error_code == 404 %}
+                        <i class="fas fa-search fa-4x text-warning"></i>
+                        {% elif error_code == 500 %}
+                        <i class="fas fa-exclamation-triangle fa-4x text-danger"></i>
+                        {% else %}
+                        <i class="fas fa-question-circle fa-4x text-muted"></i>
+                        {% endif %}
+                    </div>
+
+                    <!-- Error Code -->
+                    <h1 class="display-1 fw-bold text-{{ 'danger' if error_code in [403, 500] else 'warning' if error_code == 404 else 'muted' }}">
+                        {{ error_code }}
+                    </h1>
+
+                    <!-- Error Message -->
+                    <h3 class="mb-3">
+                        {% if error_code == 403 %}
+                        Access Forbidden
+                        {% elif error_code == 404 %}
+                        Page Not Found
+                        {% elif error_code == 500 %}
+                        Internal Server Error
+                        {% else %}
+                        Unknown Error
+                        {% endif %}
+                    </h3>
+
+                    <!-- Error Description -->
+                    <p class="text-muted mb-4">
+                        {% if error_code == 403 %}
+                        You don't have permission to access this resource. Please contact your administrator if you believe this is an error.
+                        {% elif error_code == 404 %}
+                        The page you're looking for doesn't exist. It may have been moved, deleted, or you entered the wrong URL.
+                        {% elif error_code == 500 %}
+                        Something went wrong on our end. We're working to fix this issue. Please try again later.
+                        {% else %}
+                        {{ error_message or "An unexpected error occurred" }}
+                        {% endif %}
+                    </p>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">
+                            <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+                        </a>
+                        
+                        <button onclick="history.back()" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Go Back
+                        </button>
+                        
+                        {% if error_code == 404 %}
+                        <a href="{{ url_for('home.home') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-home me-2"></i>Home Page
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Additional Help -->
+                    {% if error_code == 403 %}
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="text-muted mb-2">Need Access?</h6>
+                        <p class="small text-muted mb-0">
+                            If you believe you should have access to this resource, please contact the system administrator 
+                            or check that you're logged in with the correct account.
+                        </p>
+                    </div>
+                    {% elif error_code == 500 %}
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="text-muted mb-2">Report This Issue</h6>
+                        <p class="small text-muted mb-2">
+                            If this problem persists, please report it to the technical team with the following information:
+                        </p>                        <div class="small text-muted">
+                            <strong>Time:</strong> Current Date/Time<br>
+                            <strong>URL:</strong> {{ request.url }}<br>
+                            <strong>User Agent:</strong> {{ request.user_agent.string[:50] }}...
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links for Admins -->
+    {% if session.user_type == 'admin' %}
+    <div class="row justify-content-center mt-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-tools me-2"></i>Admin Quick Links
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-outline-primary w-100">
+                                <i class="fas fa-users me-1"></i>Users
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.pending_instructors') }}" class="btn btn-sm btn-outline-warning w-100">
+                                <i class="fas fa-chalkboard-teacher me-1"></i>Instructors
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.pending_companies') }}" class="btn btn-sm btn-outline-info w-100">
+                                <i class="fas fa-building me-1"></i>Companies
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.settings') }}" class="btn btn-sm btn-outline-secondary w-100">
+                                <i class="fas fa-cog me-1"></i>Settings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card {
+    border-radius: 15px;
+}
+
+.display-1 {
+    font-size: 6rem;
+    line-height: 1;
+}
+
+@media (max-width: 576px) {
+    .display-1 {
+        font-size: 4rem;
+    }
+}
+
+.btn {
+    border-radius: 8px;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+</style>
+{% endblock %}

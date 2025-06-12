@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Frequently Asked Questions - Sec Era{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3" style="color: #223947;">
+            <i class="fas fa-question-circle me-3"></i>
+            Frequently Asked Questions
+        </h1>
+        <p class="lead text-muted mb-4">Find answers to common questions about Sec Era Platform</p>
+        
+        <!-- Search Box -->
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="input-group mb-4">
+                    <input type="text" class="form-control form-control-lg" id="faqSearch" 
+                           placeholder="Search for answers..." onkeyup="searchFAQs()">
+                    <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Links -->
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="#general" class="btn btn-outline-primary btn-sm">General</a>
+            <a href="#subscriptions" class="btn btn-outline-primary btn-sm">Subscriptions</a>
+            <a href="#courses" class="btn btn-outline-primary btn-sm">Courses</a>
+            <a href="#technical" class="btn btn-outline-primary btn-sm">Technical</a>
+        </div>
+    </div>
+
+    <!-- FAQ Categories -->
+    {% for category_data in faqs %}
+    <div class="mb-5" id="{{ category_data.category.lower() }}">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="h3 fw-bold mb-4 pb-2 border-bottom" style="color: #223947;">
+                    <i class="fas fa-folder-open me-2"></i>
+                    {{ category_data.category }}
+                </h2>
+                
+                <!-- Accordion for Questions -->
+                <div class="accordion" id="accordion{{ category_data.category }}">
+                    {% for question in category_data.questions %}
+                    <div class="accordion-item faq-item">
+                        <h3 class="accordion-header" id="heading{{ loop.index }}{{ category_data.category }}">
+                            <button class="accordion-button collapsed" type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse{{ loop.index }}{{ category_data.category }}" 
+                                    aria-expanded="false" 
+                                    aria-controls="collapse{{ loop.index }}{{ category_data.category }}">
+                                <i class="fas fa-question-circle me-2 text-primary"></i>
+                                {{ question.question }}
+                            </button>
+                        </h3>
+                        <div id="collapse{{ loop.index }}{{ category_data.category }}" 
+                             class="accordion-collapse collapse" 
+                             aria-labelledby="heading{{ loop.index }}{{ category_data.category }}" 
+                             data-bs-parent="#accordion{{ category_data.category }}">
+                            <div class="accordion-body">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-lightbulb fa-2x text-warning"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0">{{ question.answer }}</p>
+                                        
+                                        <!-- Helpful Actions -->
+                                        <div class="mt-3 pt-3 border-top">
+                                            <small class="text-muted">Was this helpful?</small>
+                                            <div class="d-inline-flex ms-2 gap-1">
+                                                <button class="btn btn-sm btn-outline-success" onclick="markHelpful(true)">
+                                                    <i class="fas fa-thumbs-up"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="markHelpful(false)">
+                                                    <i class="fas fa-thumbs-down"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Still Need Help Section -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #223947 0%, #2c4a5a 100%);">
+                <div class="card-body text-center py-5 text-white">
+                    <i class="fas fa-headset fa-3x mb-3"></i>
+                    <h3 class="fw-bold mb-3">Still Need Help?</h3>
+                    <p class="lead mb-4">Can't find what you're looking for? Our support team is here to help!</p>
+                    
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                                <a href="{{ url_for('help.contact') }}" class="btn btn-light btn-lg">
+                                    <i class="fas fa-envelope me-2"></i>Contact Support
+                                </a>
+                                <a href="mailto:support@secera.com" class="btn btn-outline-light btn-lg">
+                                    <i class="fas fa-at me-2"></i>Email Us
+                                </a>
+                                <a href="tel:+1555123456" class="btn btn-outline-light btn-lg">
+                                    <i class="fas fa-phone me-2"></i>Call Us
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Support Hours -->
+                    <div class="mt-4 pt-4 border-top border-light border-opacity-25">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6 class="fw-bold">📧 Email Support</h6>
+                                <p class="small mb-0">24/7 - Response within 24 hours</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="fw-bold">📞 Phone Support</h6>
+                                <p class="small mb-0">Mon-Fri, 9AM-6PM EST</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="fw-bold">💬 Live Chat</h6>
+                                <p class="small mb-0">Mon-Fri, 9AM-9PM EST</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function searchFAQs() {
+    const searchTerm = document.getElementById('faqSearch').value.toLowerCase();
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(item => {
+        const question = item.querySelector('.accordion-button').textContent.toLowerCase();
+        const answer = item.querySelector('.accordion-body').textContent.toLowerCase();
+        
+        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+            item.style.display = 'block';
+            // Highlight search terms (basic implementation)
+            if (searchTerm.length > 2) {
+                item.classList.add('search-highlight');
+            } else {
+                item.classList.remove('search-highlight');
+            }
+        } else {
+            item.style.display = searchTerm === '' ? 'block' : 'none';
+            item.classList.remove('search-highlight');
+        }
+    });
+    
+    // Show/hide category headers
+    const categories = document.querySelectorAll('[id^="accordion"]');
+    categories.forEach(category => {
+        const visibleItems = category.querySelectorAll('.faq-item[style*="block"], .faq-item:not([style*="none"])');
+        const categoryHeader = category.previousElementSibling;
+        if (visibleItems.length === 0 && searchTerm !== '') {
+            categoryHeader.style.display = 'none';
+        } else {
+            categoryHeader.style.display = 'block';
+        }
+    });
+}
+
+function markHelpful(isHelpful) {
+    // In a real implementation, this would send feedback to the server
+    const message = isHelpful ? 'Thank you for your feedback!' : 'We\'ll work on improving this answer.';
+    
+    // Show temporary feedback
+    const button = event.target.closest('button');
+    const originalContent = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-check"></i>';
+    button.disabled = true;
+    
+    setTimeout(() => {
+        button.innerHTML = originalContent;
+        button.disabled = false;
+    }, 2000);
+    
+    // You could also show a toast notification
+    showToast(message, isHelpful ? 'success' : 'info');
+}
+
+function showToast(message, type = 'info') {
+    // Simple toast implementation
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 1060; min-width: 250px;';
+    toast.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-info-circle me-2"></i>
+            <span>${message}</span>
+            <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 3000);
+}
+
+// Smooth scrolling for quick links
+document.addEventListener('DOMContentLoaded', function() {
+    const quickLinks = document.querySelectorAll('a[href^="#"]');
+    quickLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+});
+</script>
+
+<style>
+.search-highlight {
+    background-color: rgba(255, 193, 7, 0.1);
+    border-left: 4px solid #ffc107;
+}
+
+.accordion-item {
+    transition: all 0.3s ease;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #223947;
+    color: white;
+}
+
+.accordion-button:not(.collapsed)::after {
+    filter: brightness(0) invert(1);
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(34, 57, 71, 0.25);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy - Sec Era{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3" style="color: #223947;">
+            <i class="fas fa-shield-alt me-3"></i>
+            Privacy Policy
+        </h1>
+        <p class="lead text-muted">Your privacy is important to us</p>
+        <p class="text-muted">Last updated: <strong>{{ moment().strftime('%B %d, %Y') }}</strong></p>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm position-sticky" style="top: 20px;">
+                <div class="card-header" style="background-color: #223947; color: white;">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Table of Contents
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="#overview" class="list-group-item list-group-item-action">Overview</a>
+                        <a href="#information-collected" class="list-group-item list-group-item-action">Information We Collect</a>
+                        <a href="#how-we-use" class="list-group-item list-group-item-action">How We Use Information</a>
+                        <a href="#information-sharing" class="list-group-item list-group-item-action">Information Sharing</a>
+                        <a href="#data-security" class="list-group-item list-group-item-action">Data Security</a>
+                        <a href="#your-rights" class="list-group-item list-group-item-action">Your Rights</a>
+                        <a href="#cookies" class="list-group-item list-group-item-action">Cookies</a>
+                        <a href="#international" class="list-group-item list-group-item-action">International Transfers</a>
+                        <a href="#children" class="list-group-item list-group-item-action">Children's Privacy</a>
+                        <a href="#changes" class="list-group-item list-group-item-action">Policy Changes</a>
+                        <a href="#contact" class="list-group-item list-group-item-action">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-9">
+            <!-- Overview -->
+            <section id="overview" class="mb-5">
+                <h2 class="h3 fw-bold mb-3" style="color: #223947;">Overview</h2>
+                <div class="card border-0 bg-light">
+                    <div class="card-body">
+                        <p>Sec Era Platform ("we," "our," or "us") is committed to protecting your privacy and personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our cybersecurity learning platform.</p>
+                        <p class="mb-0">By using our service, you agree to the collection and use of information in accordance with this policy.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Information We Collect -->
+            <section id="information-collected" class="mb-5">
+                <h2 class="h3 fw-bold mb-3" style="color: #223947;">Information We Collect</h2>
+                
+                <h4 class="h5 fw-bold mb-3">Personal Information</h4>
+                <ul class="list-group list-group-flush mb-4">
+                    <li class="list-group-item">
+                        <i class="fas fa-user text-primary me-2"></i>
+                        <strong>Account Information:</strong> Name, email address, username, password
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-id-card text-primary me-2"></i>
+                        <strong>Profile Information:</strong> Bio, profile picture, professional details
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-credit-card text-primary me-2"></i>
+                        <strong>Payment Information:</strong> Billing address, payment method details (processed securely)
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-phone text-primary me-2"></i>
+                        <strong>Contact Information:</strong> Phone number, address (optional)
+                    </li>
+                </ul>
+
+                <h4 class="h5 fw-bold mb-3">Usage Information</h4>
+                <ul class="list-group list-group-flush mb-4">
+                    <li class="list-group-item">
+                        <i class="fas fa-chart-line text-success me-2"></i>
+                        <strong>Learning Progress:</strong> Course completion, quiz scores, certification status
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-clock text-success me-2"></i>
+                        <strong>Platform Usage:</strong> Login times, feature usage, time spent on courses
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-mouse-pointer text-success me-2"></i>
+                        <strong>Interaction Data:</strong> Clicks, navigation patterns, search queries
+                    </li>
+                </ul>
+
+                <h4 class="h5 fw-bold mb-3">Technical Information</h4>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="fas fa-laptop text-info me-2"></i>
+                        <strong>Device Information:</strong> Browser type, operating system, device type
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-network-wired text-info me-2"></i>
+                        <strong>Network Information:</strong> IP address, location data (approximate)
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-bug text-info me-2"></i>
+                        <strong>Error Information:</strong> Crash reports, error logs (for platform improvement)
+                    </li>
+                </ul>
+            </section>
+
+            <!-- How We Use Information -->
+            <section id="how-we-use" class="mb-5">
+                <h2 class="h3 fw-bold mb-3" style="color: #223947;">How We Use Your Information</h2>
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 bg-light">
+                            <div class="card-body">
+                                <h5 class="fw-bold text-primary">
+                                    <i class="fas fa-graduation-cap me-2"></i>Learning Experience
+                                </h5>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Provide personalized learning paths</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Track and display progress</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Generate certificates</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Recommend relevant content</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 bg-light">
+                            <div class="card-body">
+                                <h5 class="fw-bold text-primary">
+                                    <i class="fas fa-cog me-2"></i>Platform Operation
+                                </h5>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Maintain and improve services</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Process payments and subscriptions</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Provide customer support</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Ensure platform security</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Information Sharing -->
+            <section id="information-sharing" class="mb-5">
+                <h2 class="h3 fw-bold mb-3" style="color: #223947;">Information Sharing</h2>
+                
+                <div class="alert alert-success">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    <strong>We do not sell, trade, or rent your personal information to third parties.</strong>
+                </div>
+
+                <p>We may share your information only in the following circumstances:</p>
+                
+                <div class="accordion" id="sharingAccordion">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#service-providers">
+                                <i class="fas fa-handshake me-2 text-primary"></i>Service Providers
+                            </button>
+                        </h3>
+                        <div id="service-providers" class="accordion-collapse collapse" data-bs-parent="#sharingAccordion">
+                            <div class="accordion-body">
+                                We work with trusted third-party service providers who help us operate our platform:
+                                <ul class="mt-2">
+                                    <li>Payment processors (Stripe, PayPal)</li>
+                                    <li>Email service providers</li>
+                                    <li>Cloud hosting services (AWS, Google Cloud)</li>
+                                    <li>Analytics providers (Google Analytics)</li>
+                                </ul>
+                                These providers are contractually bound to protect your information.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#legal-requirements">
+                                <i class="fas fa-gavel me-2 text-warning"></i>Legal Requirements
+                            </button>
+                        </h3>
+                        <div id="legal-requirements" class="accordion-collapse collapse" data-bs-parent="#sharingAccordion">
+                            <div class="accordion-body">
+                                We may disclose your information if required by law or in response to:
+                                <ul class="mt-2">
+                                    <li>Court orders or legal processes</li>
+                                    <li>Government requests or investigations</li>
+                                    <li>Protection of our rights or safety</li>
+                                    <li>Prevention of fraud or illegal activities</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Security -->
+            <section id="data-security" class="mb-5">
+                <h2 class="h3 fw-bold mb-3" style="color: #223947;">Data Security</h2>
+                
+                <div class="row g-4">
+                    <div class="col-md-12">
+                        <div class="card border-0" style="background: linear-gradient(135deg, #223947 0%, #2c4a5a 100%);">
+                            <div class="card-body text-white">
+                                <h5 class="fw-bold mb-3">
+                                    <i class="fas fa-lock me-2"></i>Security Measures
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled">
+                                            <li class="mb-2"><i class="fas fa-shield-alt text-success me-2"></i>256-bit SSL encryption</li>
+                                            <li class="mb-2"><i class="fas fa-database text-success me-2"></i>Encrypted data storage</li>
+                                            <li class="mb-2"><i class="fas fa-user-shield text-success me-2"></i>Multi-factor authentication</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled">
+                                            <li class="mb-2"><i class="fas fa-eye text-success me-2"></i>Regular security audits</li>
+                                            <li class="mb-2"><i class="fas fa-fire-extinguisher text-success me-2"></i>Intrusion detection systems</li>
+                                            <li class="mb-2"><i class="fas fa-backup text-success me-2"></i>Regular data backups</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Your Rights -->
+            <section id="your-rights" class="mb-5">
+                <h2 class="h3 fw-bold mb-3" style="color: #223947;">Your Privacy Rights</h2>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body text-center">
+                                <i class="fas fa-eye fa-2x text-primary mb-3"></i>
+                                <h6 class="fw-bold">Access</h6>
+                                <p class="small mb-0">Request a copy of your personal data</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 border-success">
+                            <div class="card-body text-center">
+                                <i class="fas fa-edit fa-2x text-success mb-3"></i>
+                                <h6 class="fw-bold">Correction</h6>
+                                <p class="small mb-0">Update or correct your information</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 border-warning">
+                            <div class="card-body text-center">
+                                <i class="fas fa-ban fa-2x text-warning mb-3"></i>
+                                <h6 class="fw-bold">Deletion</h6>
+                                <p class="small mb-0">Request deletion of your data</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 border-info">
+                            <div class="card-body text-center">
+                                <i class="fas fa-download fa-2x text-info mb-3"></i>
+                                <h6 class="fw-bold">Portability</h6>
+                                <p class="small mb-0">Export your data in a readable format</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    To exercise any of these rights, please contact us at <strong>privacy@secera.com</strong> or use our <a href="{{ url_for('help.contact') }}" class="alert-link">contact form</a>.
+                </div>
+            </section>
+
+            <!-- Additional Sections -->
+            <section id="cookies" class="mb-5">
+                <h2 class="h3 fw-bold mb-3" style="color: #223947;">Cookies and Tracking</h2>
+                <p>We use cookies and similar technologies to enhance your experience:</p>
+                <ul>
+                    <li><strong>Essential Cookies:</strong> Required for platform functionality</li>
+                    <li><strong>Performance Cookies:</strong> Help us understand how you use our platform</li>
+                    <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
+                </ul>
+                <p>You can manage cookie preferences in your browser settings.</p>
+            </section>
+
+            <section id="international" class="mb-5">
+                <h2 class="h3 fw-bold mb-3" style="color: #223947;">International Data Transfers</h2>
+                <p>Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place to protect your data during international transfers.</p>
+            </section>
+
+            <section id="children" class="mb-5">
+                <h2 class="h3 fw-bold mb-3" style="color: #223947;">Children's Privacy</h2>
+                <div class="alert alert-warning">
+                    <i class="fas fa-child me-2"></i>
+                    Our service is not intended for children under 13. We do not knowingly collect personal information from children under 13.
+                </div>
+            </section>
+
+            <section id="changes" class="mb-5">
+                <h2 class="h3 fw-bold mb-3" style="color: #223947;">Policy Changes</h2>
+                <p>We may update this Privacy Policy from time to time. We will notify you of any changes by:</p>
+                <ul>
+                    <li>Posting the new policy on this page</li>
+                    <li>Sending you an email notification</li>
+                    <li>Displaying a prominent notice on our platform</li>
+                </ul>
+            </section>
+
+            <section id="contact" class="mb-5">
+                <h2 class="h3 fw-bold mb-3" style="color: #223947;">Contact Us</h2>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <p class="mb-3">If you have any questions about this Privacy Policy, please contact us:</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Email:</strong> privacy@secera.com</p>
+                                <p class="mb-1"><strong>Phone:</strong> +1 (555) 123-4567</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Address:</strong> 123 Security Street</p>
+                                <p class="mb-1">Tech City, TC 12345, USA</p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <a href="{{ url_for('help.contact') }}" class="btn btn-primary">
+                                <i class="fas fa-envelope me-1"></i>Contact Form
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Smooth scrolling for table of contents
+document.addEventListener('DOMContentLoaded', function() {
+    const tocLinks = document.querySelectorAll('.list-group-item-action');
+    tocLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Update active link
+                tocLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
+    });
+    
+    // Highlight current section on scroll
+    window.addEventListener('scroll', function() {
+        const sections = document.querySelectorAll('section[id]');
+        let current = '';
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 100;
+            if (window.scrollY >= sectionTop) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        tocLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

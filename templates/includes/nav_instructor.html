@@ -10,12 +10,28 @@
            href="{{ url_for('courses.manage_courses') }}">
            <i class="fas fa-book-open"></i> My Courses
         </a>
-    </li>
-    <li class="nav-item">
+    </li>    <li class="nav-item">
         <a class="nav-link {% if request.endpoint == 'assignments.manage_assignments' %}active{% endif %}" 
            href="{{ url_for('assignments.manage_assignments') }}">
            <i class="fas fa-clipboard-check"></i> Assignments
         </a>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle {% if request.blueprint == 'help' %}active{% endif %}" 
+           href="#" id="helpDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+           <i class="fas fa-question-circle"></i> Help
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="helpDropdown">
+            <li><a class="dropdown-item" href="{{ url_for('help.faq') }}">
+                <i class="fas fa-question-circle me-2"></i>FAQ
+            </a></li>
+            <li><a class="dropdown-item" href="{{ url_for('help.contact') }}">
+                <i class="fas fa-envelope me-2"></i>Contact Support
+            </a></li>
+            <li><a class="dropdown-item" href="{{ url_for('help.about') }}">
+                <i class="fas fa-info-circle me-2"></i>About Us
+            </a></li>
+        </ul>
     </li>
 </ul>
 

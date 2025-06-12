@@ -1,0 +1,43 @@
+<ul class="navbar-nav me-auto">
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}" 
+           href="{{ url_for('admin.dashboard') }}">
+           <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+        </a>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle {% if request.endpoint in ['admin.users', 'admin.pending_instructors', 'admin.pending_companies'] %}active{% endif %}" 
+           href="#" id="usersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+           <i class="fas fa-users"></i> User Management
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="usersDropdown">
+            <li><a class="dropdown-item" href="{{ url_for('admin.users') }}">All Users</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin.pending_instructors') }}">Pending Instructors</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin.pending_companies') }}">Pending Companies</a></li>
+        </ul>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'admin.pending_courses' %}active{% endif %}" 
+           href="{{ url_for('admin.pending_courses') }}">
+           <i class="fas fa-book"></i> Course Approvals
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'admin.subscriptions' %}active{% endif %}" 
+           href="{{ url_for('admin.subscriptions') }}">
+           <i class="fas fa-credit-card"></i> Subscriptions
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'admin.reports' %}active{% endif %}" 
+           href="{{ url_for('admin.reports') }}">
+           <i class="fas fa-chart-bar"></i> Reports
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.endpoint == 'admin.settings' %}active{% endif %}" 
+           href="{{ url_for('admin.settings') }}">
+           <i class="fas fa-cog"></i> Settings
+        </a>
+    </li>
+</ul>

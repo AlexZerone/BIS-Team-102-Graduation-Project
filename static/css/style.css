@@ -1,16 +1,17 @@
 /**
  * Sec Era - Main Stylesheet
- * Version: 1.0.0
- * Last Updated: 2025-06-03
+ * Version: 2.0.0
+ * Last Updated: 2025-06-11
+ * Primary Theme Color: #223947
  */
 
 /* ======== CSS Variables ======== */
 :root {
-  /* Primary brand colors */
-  --primary-color: #0d6efd;
-  --primary-hover: #0b5ed7;
-  --primary-light: #cfe2ff;
-  --primary-dark: #084298;
+  /* Primary brand colors - Updated theme */
+  --primary-color: #223947;
+  --primary-hover: #1a2d3a;
+  --primary-light: #e8ecef;
+  --primary-dark: #0f1a21;
   
   /* Secondary colors */
   --secondary-color: #6c757d;
@@ -18,6 +19,11 @@
   --info-color: #0dcaf0;
   --warning-color: #ffc107;
   --danger-color: #dc3545;
+  
+  /* Accent colors */
+  --accent-1: #34495e;
+  --accent-2: #2c3e50;
+  --accent-light: #bdc3c7;
   
   /* Neutral colors */
   --text-color: #212529;
@@ -30,7 +36,7 @@
   --header-height: 70px;
   --footer-padding: 2.5rem;
   --section-spacing: 5rem;
-  --card-border-radius: 0.5rem;
+  --card-border-radius: 0.75rem;
   --container-max-width: 1320px;
   
   /* Animation speeds */
@@ -39,9 +45,9 @@
   --transition-fast: 0.15s;
   
   /* Box shadows */
-  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+  --shadow-sm: 0 0.125rem 0.25rem rgba(34, 57, 71, 0.075);
+  --shadow-md: 0 0.5rem 1rem rgba(34, 57, 71, 0.15);
+  --shadow-lg: 0 1rem 3rem rgba(34, 57, 71, 0.175);
   
   /* Z-index layers */
   --z-dropdown: 1000;
@@ -141,6 +147,355 @@ img {
 
 .main-navbar .navbar-brand i {
   font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+  color: var(--text-color);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+  color: var(--primary-color);
+}
+
+.navbar-nav .nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 2px;
+  background-color: var(--primary-color);
+  border-radius: 1px;
+}
+
+/* ======== Button Styles ======== */
+.btn {
+  border-radius: var(--card-border-radius);
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-1));
+  border: 1px solid var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-hover), var(--accent-2));
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline-primary {
+  background: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* ======== Card Styles ======== */
+.card {
+  border: none;
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-header {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-1));
+  border-bottom: none;
+  color: white;
+  font-weight: 600;
+  padding: 1.25rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-footer {
+  background: var(--light-bg);
+  border-top: 1px solid var(--border-color);
+  padding: 1rem 1.5rem;
+}
+
+/* ======== Form Styles ======== */
+.form-control {
+  border: 2px solid var(--border-color);
+  border-radius: var(--card-border-radius);
+  padding: 0.75rem 1rem;
+  transition: all var(--transition-fast);
+  background: white;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(34, 57, 71, 0.25);
+  outline: 0;
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.form-select {
+  border: 2px solid var(--border-color);
+  border-radius: var(--card-border-radius);
+  padding: 0.75rem 1rem;
+  background: white;
+}
+
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* ======== Alert Styles ======== */
+.alert {
+  border: none;
+  border-radius: var(--card-border-radius);
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid;
+}
+
+.alert-success {
+  background: rgba(25, 135, 84, 0.1);
+  border-left-color: var(--success-color);
+  color: var(--success-color);
+}
+
+.alert-danger {
+  background: rgba(220, 53, 69, 0.1);
+  border-left-color: var(--danger-color);
+  color: var(--danger-color);
+}
+
+.alert-warning {
+  background: rgba(255, 193, 7, 0.1);
+  border-left-color: var(--warning-color);
+  color: #856404;
+}
+
+.alert-info {
+  background: rgba(13, 202, 240, 0.1);
+  border-left-color: var(--info-color);
+  color: #055160;
+}
+
+/* ======== Dashboard Styles ======== */
+.dashboard-card {
+  background: white;
+  border-radius: var(--card-border-radius);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  border-left: 4px solid transparent;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.dashboard-card.primary {
+  border-left-color: var(--primary-color);
+}
+
+.dashboard-card.success {
+  border-left-color: var(--success-color);
+}
+
+.dashboard-card.warning {
+  border-left-color: var(--warning-color);
+}
+
+.dashboard-card.info {
+  border-left-color: var(--info-color);
+}
+
+.stats-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  line-height: 1;
+}
+
+.stats-label {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.5rem;
+}
+
+/* ======== Hero Section ======== */
+.hero-section {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-1));
+  color: white;
+  padding: 5rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('../images/hero-pattern.svg') repeat;
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+  max-width: 600px;
+}
+
+/* ======== Table Styles ======== */
+.table {
+  border-radius: var(--card-border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.table thead th {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  font-weight: 600;
+  padding: 1rem;
+}
+
+.table tbody td {
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background: rgba(34, 57, 71, 0.05);
+}
+
+/* ======== Badge Styles ======== */
+.badge {
+  border-radius: 50px;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge.bg-success {
+  background: var(--success-color) !important;
+}
+
+.badge.bg-warning {
+  background: var(--warning-color) !important;
+  color: #000 !important;
+}
+
+.badge.bg-danger {
+  background: var(--danger-color) !important;
+}
+
+.badge.bg-info {
+  background: var(--info-color) !important;
+  color: #000 !important;
+}
+
+.badge.bg-primary {
+  background: var(--primary-color) !important;
+}
+
+/* ======== Loading States ======== */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(34, 57, 71, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ======== Responsive Design ======== */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.125rem;
+  }
+  
+  .stats-number {
+    font-size: 2rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .btn {
+    padding: 0.5rem 1rem;
+  }
 }
 
 .main-navbar .nav-link {

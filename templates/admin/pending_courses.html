@@ -1,0 +1,251 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Pending Courses - Admin{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-book me-2 text-primary"></i>
+Pending Course Approvals
+{% endblock %}
+
+{% block page_actions %}
+<span class="badge bg-primary">{{ courses|length }} pending</span>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Pending Courses -->
+    <div class="row">
+        <div class="col-md-12">
+            {% if courses %}
+                {% for course in courses %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-graduation-cap me-2"></i>
+                            {{ course.Title }}
+                        </h5>
+                        <span class="badge bg-primary">Pending Review</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><strong>Instructor:</strong> {{ course.First }} {{ course.Last }}</p>
+                                        <p class="mb-2"><strong>Department:</strong> {{ course.Department or 'Not specified' }}</p>
+                                        <p class="mb-2"><strong>Start Date:</strong> {{ course.StartDate.strftime('%Y-%m-%d') if course.StartDate else 'Not set' }}</p>
+                                        <p class="mb-2"><strong>End Date:</strong> {{ course.EndDate.strftime('%Y-%m-%d') if course.EndDate else 'Not set' }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><strong>Duration:</strong> {{ course.Duration or 'Not specified' }}</p>
+                                        <p class="mb-2"><strong>Max Students:</strong> {{ course.MaxStudents or 'Unlimited' }}</p>
+                                        <p class="mb-2"><strong>Credits:</strong> {{ course.Credits or 'Not specified' }}</p>
+                                        <p class="mb-2"><strong>Submitted:</strong> {{ course.CreatedAt.strftime('%Y-%m-%d %H:%M') if course.CreatedAt else 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                
+                                {% if course.Description %}
+                                <div class="mb-3">
+                                    <strong>Course Description:</strong>
+                                    <p class="text-muted">{{ course.Description }}</p>
+                                </div>
+                                {% endif %}
+
+                                {% if course.Prerequisites %}
+                                <div class="mb-3">
+                                    <strong>Prerequisites:</strong>
+                                    <p class="text-muted">{{ course.Prerequisites }}</p>
+                                </div>
+                                {% endif %}
+
+                                {% if course.LearningObjectives %}
+                                <div class="mb-3">
+                                    <strong>Learning Objectives:</strong>
+                                    <p class="text-muted">{{ course.LearningObjectives }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title">Quick Actions</h6>
+                                        <div class="d-grid gap-2">
+                                            <button type="button" class="btn btn-success" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#approveModal{{ course.CourseID }}">
+                                                <i class="fas fa-check me-2"></i>Approve
+                                            </button>
+                                            <button type="button" class="btn btn-danger" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#rejectModal{{ course.CourseID }}">
+                                                <i class="fas fa-times me-2"></i>Reject
+                                            </button>
+                                            <button type="button" class="btn btn-outline-info" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#detailModal{{ course.CourseID }}">
+                                                <i class="fas fa-eye me-2"></i>View Details
+                                            </button>
+                                        </div>
+
+                                        {% if course.IsPublished %}
+                                        <hr>
+                                        <span class="badge bg-success">Published</span>
+                                        {% else %}
+                                        <hr>
+                                        <span class="badge bg-secondary">Unpublished</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approve Modal -->
+                <div class="modal fade" id="approveModal{{ course.CourseID }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form method="POST" action="{{ url_for('admin.approve_course', course_id=course.CourseID) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="modal-header bg-success text-white">
+                                    <h5 class="modal-title">Approve Course</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to approve the course <strong>"{{ course.Title }}"</strong>?</p>
+                                    <p class="text-muted">This will publish the course and make it available for student enrollment.</p>
+                                    
+                                    <div class="mb-3">
+                                        <label for="reason" class="form-label">Approval Notes (Optional)</label>
+                                        <textarea class="form-control" name="reason" rows="3" 
+                                                  placeholder="Add any notes about this approval..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" name="action" value="approve" class="btn btn-success">
+                                        <i class="fas fa-check me-1"></i>Approve & Publish Course
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reject Modal -->
+                <div class="modal fade" id="rejectModal{{ course.CourseID }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form method="POST" action="{{ url_for('admin.approve_course', course_id=course.CourseID) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">Reject Course</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to reject the course <strong>"{{ course.Title }}"</strong>?</p>
+                                    
+                                    <div class="mb-3">
+                                        <label for="reason" class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" name="reason" rows="3" required
+                                                  placeholder="Please provide a reason for rejection..."></textarea>
+                                        <small class="text-muted">This reason will be communicated to the instructor.</small>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-danger">
+                                        <i class="fas fa-times me-1"></i>Reject Course
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Modal -->
+                <div class="modal fade" id="detailModal{{ course.CourseID }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Course Details: {{ course.Title }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Course Information</h6>
+                                        <p><strong>Title:</strong> {{ course.Title }}</p>
+                                        <p><strong>Course Code:</strong> {{ course.CourseCode or 'Not specified' }}</p>
+                                        <p><strong>Credits:</strong> {{ course.Credits or 'Not specified' }}</p>
+                                        <p><strong>Duration:</strong> {{ course.Duration or 'Not specified' }}</p>
+                                        <p><strong>Max Students:</strong> {{ course.MaxStudents or 'Unlimited' }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Instructor & Dates</h6>
+                                        <p><strong>Instructor:</strong> {{ course.First }} {{ course.Last }}</p>
+                                        <p><strong>Department:</strong> {{ course.Department or 'Not specified' }}</p>
+                                        <p><strong>Start Date:</strong> {{ course.StartDate.strftime('%Y-%m-%d') if course.StartDate else 'Not set' }}</p>
+                                        <p><strong>End Date:</strong> {{ course.EndDate.strftime('%Y-%m-%d') if course.EndDate else 'Not set' }}</p>
+                                        <p><strong>Status:</strong> 
+                                            <span class="badge bg-{{ 'success' if course.IsPublished else 'secondary' }}">
+                                                {{ 'Published' if course.IsPublished else 'Unpublished' }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {% if course.Description %}
+                                <hr>
+                                <h6 class="text-primary">Course Description</h6>
+                                <p>{{ course.Description }}</p>
+                                {% endif %}
+
+                                {% if course.Prerequisites %}
+                                <hr>
+                                <h6 class="text-primary">Prerequisites</h6>
+                                <p>{{ course.Prerequisites }}</p>
+                                {% endif %}
+
+                                {% if course.LearningObjectives %}
+                                <hr>
+                                <h6 class="text-primary">Learning Objectives</h6>
+                                <p>{{ course.LearningObjectives }}</p>
+                                {% endif %}
+
+                                {% if course.Syllabus %}
+                                <hr>
+                                <h6 class="text-primary">Syllabus</h6>
+                                <p>{{ course.Syllabus }}</p>
+                                {% endif %}
+
+                                {% if course.AssessmentMethod %}
+                                <hr>
+                                <h6 class="text-primary">Assessment Method</h6>
+                                <p>{{ course.AssessmentMethod }}</p>
+                                {% endif %}
+
+                                <hr>
+                                <h6 class="text-primary">Submission Timeline</h6>
+                                <p><strong>Submitted:</strong> {{ course.CreatedAt.strftime('%Y-%m-%d %H:%M') if course.CreatedAt else 'N/A' }}</p>
+                                <p><strong>Last Updated:</strong> {{ course.UpdatedAt.strftime('%Y-%m-%d %H:%M') if course.UpdatedAt else 'N/A' }}</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <h4 class="text-muted">No Pending Course Approvals</h4>
+                    <p class="text-muted">All course submissions have been processed.</p>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">
+                        <i class="fas fa-tachometer-alt me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            {% endif %}{% endblock %}
